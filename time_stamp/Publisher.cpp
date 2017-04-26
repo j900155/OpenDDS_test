@@ -19,10 +19,9 @@
 #include "MessengerTypeSupportImpl.h"
 
 //time stamp
-#include<sys/time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <sys/time.h>
 
+#include <iostream>
 int
 ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 {
@@ -155,14 +154,15 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
     message.from       = "Comic Book Guy";
     message.subject    = "Review";
-    message.text       = "Worst. Movie. Ever.";
+    message.stamp       =  tv.tv_usec;
     message.count      = 0;
-	printf("time %d\n",tv.tv_usec);
+	std::cout << "time " << tv.tv_usec << std::endl;
     for (int i = 0; i < 10; ++i) {
 	  gettimeofday(&tv,NULL);
       DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
       ++message.count;
       ++message.subject_id;
+	  message.stamp =  tv.tv_usec;
       if (error != DDS::RETCODE_OK) {
         ACE_ERROR((LM_ERROR,
                    ACE_TEXT("ERROR: %N:%l: main() -")

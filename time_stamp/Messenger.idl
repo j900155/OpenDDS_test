@@ -7,7 +7,7 @@ module Messenger
 		string from;
 		string subject;
 		long subject_id;
-		string text;
+		long stamp;
 		long count;
 	};
 };
