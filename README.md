@@ -5,5 +5,12 @@
 * time_stamp 內為有加時戳標記
 
 * bigger_200 為大於 200byte 的傳輸並加上時戳
+# 安裝步驟
+在安裝完 OpenDDS 後
+1. 執行 git clone https://github.com/j900155/OpenDDS_test.git
+![clone](img/clone.png)
+2. 執行 ./configure
+3.切換目錄到 OpenDDS_test/time_stamp
+4. 編譯
 
 
