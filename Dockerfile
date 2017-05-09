@@ -7,7 +7,9 @@ RUN tar -zxvf OpenDDS-3.10.tar.gz
 WORKDIR OpenDDS-3.10
 RUN git clone https://github.com/j900155/OpenDDS_test.git
 RUN ./configure --prefix=/usr/local
-RUN souse setenv.sh
+ENV DDS_ROOT /OpenDDS-3.10
+ENV ACE_ROOT=/OpenDDS-3.10/ACE_wrappers
+ENV TAO_ROOT=/OpenDDS-3.10/ACE_wrappers
 RUN make
 RUN make install
 
