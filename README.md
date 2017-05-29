@@ -10,7 +10,10 @@
 1. 執行 git clone https://github.com/j900155/OpenDDS_test.git
 ![clone](img/clone.png)
 2. 執行 ./configure
+![configure](img/configure.png)
 3.切換目錄到 OpenDDS_test/time_stamp
+![switch](img/SwitchToTimeStamp.png)
 4. 編譯
+![amke](img/make.png)
 
 
