@@ -1,0 +1,11 @@
+module T2
+{
+#pragma DCPS_DATA_TYPE "T2::T2"
+#pragma DCPS_DATA_Key "T2::T2 T2_id"
+
+	struct T2
+	{
+		long T2_id;
+		String T2_S;
+	};
+};
