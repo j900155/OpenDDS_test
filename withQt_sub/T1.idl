@@ -1,0 +1,9 @@
+module mT1{
+#pragma DCPS_DATA_TYPE "mT1::T1"
+#pragma DCPS_DATA_Key "mT1::T1 T1_id"
+
+	struct T1{
+		long T1_id;
+		string T1_S;
+	};
+};

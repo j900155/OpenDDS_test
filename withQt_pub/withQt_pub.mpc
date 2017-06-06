@@ -1,0 +1,20 @@
+project(withQt) : dcpsexe, qt4_settings, dcps_rtps_udp, dcps_multicast, dcps_tcp, dcps_udp, boost_or_cxx11 {
+	exename = *
+	includes += .
+
+	TypeSupport_files{
+		T1.idl
+	}
+
+	MOC_Files{
+		UiAction.h
+	}
+	Header_Files{
+		ui_Ui.h
+	}
+	Source_files{
+		main.cpp
+		UiAction.cpp
+		UiAction_moc.cpp
+	}
+}
