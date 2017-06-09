@@ -27,5 +27,8 @@ class UiAction : public QDialog{
 		DDS::DomainParticipant_var participant_;
 		DDS::Publisher_var         publisher;
 		DDS::Subscriber_var        subscriber;
+		mT1::T1DataWriter_var	   dw1;
+		mT1::T1DataWriter_var	   dw2;
+		int id;
 };
 #endif

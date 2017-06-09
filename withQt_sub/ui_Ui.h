@@ -60,7 +60,7 @@ public:
 
         Topic1Text = new QLineEdit(horizontalLayoutWidget);
         Topic1Text->setObjectName(QString::fromUtf8("Topic1Text"));
-
+		Topic1Text->setReadOnly(true);
         horizontalLayout->addWidget(Topic1Text);
 
         horizontalLayoutWidget_2 = new QWidget(Dialog);
@@ -76,6 +76,7 @@ public:
 
         Topic2Text = new QLineEdit(horizontalLayoutWidget_2);
         Topic2Text->setObjectName(QString::fromUtf8("Topic2Text"));
+		Topic2Text->setReadOnly(true);
 
         horizontalLayout_2->addWidget(Topic2Text);
 
@@ -92,6 +93,7 @@ public:
 
         Topic4Text = new QLineEdit(horizontalLayoutWidget_3);
         Topic4Text->setObjectName(QString::fromUtf8("Topic4Text"));
+		Topic4Text->setReadOnly(true);
 
         horizontalLayout_3->addWidget(Topic4Text);
 
@@ -108,6 +110,7 @@ public:
 
         Topic3Text = new QLineEdit(horizontalLayoutWidget_4);
         Topic3Text->setObjectName(QString::fromUtf8("Topic3Text"));
+		Topic3Text->setReadOnly(true);
 
         horizontalLayout_4->addWidget(Topic3Text);
 

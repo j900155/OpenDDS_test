@@ -14,7 +14,7 @@
 UiAction::UiAction(DDS::DomainParticipant_var participant)
 : participant_(participant)
 {
-
+	id = 0;
 	std::cout << participant->get_domain_id()<<std::endl;
 
 	mT1::T1TypeSupport_var ts = new mT1::T1TypeSupportImpl;
@@ -67,6 +67,39 @@ UiAction::UiAction(DDS::DomainParticipant_var participant)
 		publisher->get_default_datawriter_qos(writerQos);
 	}
 	//publish end
+	//datawirter1
+	DDS::DataWriter_var writer1 = publisher->create_datawriter(topic1,
+															writerQos,
+															0,
+															OpenDDS::DCPS::DEFAULT_STATUS_MASK);
+	if(!writer1)
+	{
+		std::cerr <<"create writer1 fail"<< std::endl;
+	}
+	dw1 = mT1::T1DataWriter::_narrow(writer1);
+	if(!dw1)
+	{
+		std::cerr <<"narrow dw1  fail"<< std::endl;
+	}
+	//datawriter1 end
+	//datawirter2
+	DDS::DataWriter_var writer2 = publisher->create_datawriter(topic2,
+															writerQos,
+															0,
+															OpenDDS::DCPS::DEFAULT_STATUS_MASK);
+	if(!writer2)
+	{
+		std::cerr <<"create writer2 fail"<< std::endl;
+	}
+	dw2 = mT1::T1DataWriter::_narrow(writer2);
+	if(!dw2)
+	{
+		std::cerr <<"narrow dw2  fail"<< std::endl;
+	}
+
+	//datawriter1 end
+
+
 	ui.setupUi(this);
 //	qDebug()<< "start";
 }
@@ -79,55 +112,42 @@ UiAction::~UiAction()
 void UiAction::SendButtonClicked()
 {
 	std::cout << "Bueetonclicked" << std::endl;
-	//datawirter1
-	DDS::DataWriter_var writer1 = publisher->create_datawriter(topic1,
-															writerQos,
-															0,
-															OpenDDS::DCPS::DEFAULT_STATUS_MASK);
-	if(!writer1)
-	{
-		std::cerr <<"create writer1 fail"<< std::endl;
-	}
-	mT1::T1DataWriter_var dw1 = mT1::T1DataWriter::_narrow(writer1);
+	//write data1
 	if(!dw1)
 	{
 		std::cerr <<"narrow dw1  fail"<< std::endl;
 	}
 	QString qs = ui.Topic1Text->text();
 	std::string s = qs.toStdString();
-	std::cout << s << std::endl;
+	std::cout << "message1 " <<s << std::endl;
 	mT1::T1 message1;
-	message1.T1_id = 0;
+	message1.T1_id = id;
 	message1.T1_S = s.c_str();
-	dw1->write(message1, DDS::HANDLE_NIL);
-
-//datawriter1 end
-
-//datawirter2
-	DDS::DataWriter_var writer2 = publisher->create_datawriter(topic2,
-															writerQos,
-															0,
-															OpenDDS::DCPS::DEFAULT_STATUS_MASK);
-	if(!writer2)
+	std::cout << "topic " << dw1->get_topic() << std::endl;
+	for(int i=0;i<20;i++)
 	{
-		std::cerr <<"create writer1 fail"<< std::endl;
+		dw1->write(message1, DDS::HANDLE_NIL);
 	}
-	mT1::T1DataWriter_var dw2 = mT1::T1DataWriter::_narrow(writer2);
+	//write data1 end
+//write data2
 	if(!dw2)
 	{
 		std::cerr <<"narrow dw2  fail"<< std::endl;
 	}
 	qs = ui.Topic2Text->text();
 	s = qs.toStdString();
-	std::cout << s << std::endl;
-	mT1::T1 message2;
-	message2.T1_id = 0;
-	message2.T1_S = s.c_str();
-	dw2->write(message1, DDS::HANDLE_NIL);
+	std::cout <<"message2 " << s << std::endl;
+	for(int i=0;i<20;i++)
+	{
+		mT1::T1 message2;
+		message2.T1_id = id;
+		message2.T1_S = s.c_str();
 
-//datawriter1 end
-
-
+		std::cout << "topic " << dw2->get_topic() << std::endl;
+		dw2->write(message2, DDS::HANDLE_NIL);
+	}
+	//write data2 end
+	id++;
 }
 
 void UiAction::Topic1Enable(){}

@@ -6,7 +6,7 @@
 ## this file will be lost the next time it is generated.
 ##
 ## MPC Command:
-## /home/zack/github/OpenDDS/ACE_wrappers/bin/mwc.pl -type automake -features qt4=1,boost=1
+## /home/zack/github/OpenDDS/ACE_wrappers/bin/mwc.pl -type automake -features qt4=1
 
 BUILT_SOURCES =
 CLEANFILES =
@@ -93,6 +93,15 @@ CLEANFILES += \
 UiAction_moc.cpp: $(srcdir)/UiAction.h
 	$(QTDIR)/bin/moc  $(srcdir)/UiAction.h -o UiAction_moc.cpp
 
+BUILT_SOURCES += \
+  OnSubscriber_moc.cpp
+
+CLEANFILES += \
+  OnSubscriber_moc.cpp
+
+OnSubscriber_moc.cpp: $(srcdir)/OnSubscriber.h
+	$(QTDIR)/bin/moc  $(srcdir)/OnSubscriber.h -o OnSubscriber_moc.cpp
+
 noinst_PROGRAMS = WithQt
 
 WithQt_CPPFLAGS = \
@@ -105,6 +114,9 @@ WithQt_CPPFLAGS = \
   -I.
 
 WithQt_SOURCES = \
+  OnSubscriber.cpp \
+  OnSubscriber_moc.cpp \
+  Reader.cpp \
   T1C.cpp \
   T1S.cpp \
   T1TypeSupportC.cpp \
@@ -113,6 +125,9 @@ WithQt_SOURCES = \
   UiAction.cpp \
   UiAction_moc.cpp \
   main.cpp \
+  test_subscriber.cpp \
+  OnSubscriber.h \
+  Reader.h \
   T1C.h \
   T1C.inl \
   T1S.h \

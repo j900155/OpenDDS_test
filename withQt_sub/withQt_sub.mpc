@@ -8,6 +8,8 @@ project(withQt) : dcpsexe, qt4_settings, dcps_rtps_udp, dcps_multicast, dcps_tcp
 
 	MOC_Files{
 		UiAction.h
+		Reader.h
+		OnSubscriber.h
 	}
 	Header_Files{
 		ui_Ui.h
@@ -16,5 +18,8 @@ project(withQt) : dcpsexe, qt4_settings, dcps_rtps_udp, dcps_multicast, dcps_tcp
 		main.cpp
 		UiAction.cpp
 		UiAction_moc.cpp
+		Reader.cpp
+		OnSubscriber.cpp
+		OnSubscriber_moc.cpp
 	}
 }

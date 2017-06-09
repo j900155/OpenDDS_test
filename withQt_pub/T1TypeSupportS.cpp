@@ -29,8 +29,8 @@
 // TAO_IDL - Generated from
 // be/be_codegen.cpp:652
 
-#ifndef _TAO_IDL_T1TYPESUPPORTS_7AUY3C_CPP_
-#define _TAO_IDL_T1TYPESUPPORTS_7AUY3C_CPP_
+#ifndef _TAO_IDL_T1TYPESUPPORTS_SMVMIE_CPP_
+#define _TAO_IDL_T1TYPESUPPORTS_SMVMIE_CPP_
 
 
 #include "T1TypeSupportS.h"
