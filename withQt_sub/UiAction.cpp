@@ -24,19 +24,22 @@ UiAction::UiAction(DDS::DomainParticipant_var participant)
 		std::cout << participant->get_domain_id()<<std::endl;
 	}
 	std::cout << "create test" << std::endl;
-	//create reader
-	
-	//end reader
-	//OnSubscriber reader1(participant ,"Topic1");
-	thread1 = new OnSubscriber(participant,"Topic1");
-	thread2 = new OnSubscriber(participant,"Topic2");
+	thread1 = new OnSubscriber(participant,1);
+	thread2 = new OnSubscriber(participant,2);
+	thread3 = new OnSubscriber(participant,3);
+	thread4 = new OnSubscriber(participant,4);
 	std::cout << "test start" << std::endl;	
-
-
+	//connect signal slot
+	connect(thread1, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
+	connect(thread2, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
+	connect(thread3, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
+	connect(thread4, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
+	//connect signal slot
 	ui.setupUi(this);
-	//reader1.start();
 	thread1->start();
 	thread2->start();
+	thread3->start();
+	thread4->start();
 	std::cout << "UiAction end" << std::endl;
 }
 
@@ -47,19 +50,21 @@ UiAction::~UiAction()
 
 void UiAction::showMessage(QString text, int number)
 {
-	switch(number)
+	std::cout <<  number <<std::endl;
+	if(number ==1)
 	{
-		case 1:
-			ui.Topic1Text->setText(text);
-		break;
-		case 2:
-			ui.Topic2Text->setText(text);
-		break;
-		case 3:
-			ui.Topic3Text->setText(text);
-		break;
-		case 4:
-			ui.Topic4Text->setText(text);
-		break;
-	}	
+		ui.Topic1Text->setText(text);
+	}
+	else if(number ==2)
+	{
+		ui.Topic2Text->setText(text);
+	}
+	else if(number ==3)
+	{
+		ui.Topic3Text->setText(text);
+	}
+	else if(number ==4)
+	{
+		ui.Topic4Text->setText(text);
+	}
 }

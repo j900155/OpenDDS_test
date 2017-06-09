@@ -19,6 +19,8 @@ class UiAction : public QDialog
 		Ui::Dialog	ui;
 		OnSubscriber *thread1;
 		OnSubscriber *thread2;
+		OnSubscriber *thread3;
+		OnSubscriber *thread4;
 	
 };
 #endif

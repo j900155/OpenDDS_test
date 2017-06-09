@@ -5,8 +5,9 @@
 #include "T1TypeSupportC.h"
 #include "T1TypeSupportImpl.h"
 
-OnSubscriber::OnSubscriber(DDS::DomainParticipant_var participant, char *get_topic)
+OnSubscriber::OnSubscriber(DDS::DomainParticipant_var participant, int number_)
 {
+	number = number_;
 	std::cout<< "run1" << std::endl;
 	std::cout << "participant" << participant->get_domain_id() << std::endl;
 	mT1::T1TypeSupport_var ts = new mT1::T1TypeSupportImpl;
@@ -17,6 +18,28 @@ OnSubscriber::OnSubscriber(DDS::DomainParticipant_var participant, char *get_top
 	CORBA::String_var type_name = ts->get_type_name();
 	std::cout << "get_type_name" << type_name << std::endl;
 	//topic
+	char* get_topic;
+	std::cout << "numbure " << number << std::endl;
+	if(number == 1)
+	{
+		get_topic="Topic1";
+	}
+	else if(number == 2)
+	{
+		get_topic="Topic2";
+	}
+	else if(number == 3)
+	{
+		get_topic="Topic3";
+	}
+	else if(number == 4)
+	{
+		get_topic="Topic4";
+	}
+	else
+	{
+		get_topic="Topic1";
+	}
 	DDS::TopicQos topic_Qos;
 	participant->get_default_topic_qos(topic_Qos);
 	topic = participant->create_topic(get_topic,
@@ -92,6 +115,10 @@ void OnSubscriber::run()
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message id " << message.T1_id << std::endl;
 				std::cout << "message data " << message.T1_S << std::endl;
+				char* s = message.T1_S._retn();
+				//std::string s = "test";
+				QString qtext = QString::fromStdString(s);
+				emit getMessage(qtext, number);
 			}
 		}
 		usleep(10);
@@ -100,7 +127,3 @@ void OnSubscriber::run()
 
 }
 
-void getMessage()
-{
-
-}

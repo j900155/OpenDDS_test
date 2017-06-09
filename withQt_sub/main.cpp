@@ -36,16 +36,6 @@ int main(int argc, ACE_TCHAR *argv[])
 	ACE_Argv_Type_Converter atc(argc, argv);
 	QApplication app(argc, atc.get_ASCII_argv());
 	UiAction  ui(participant);
-	std::cout << "create test" << std::endl;
-	//create reader
-	
-	//end reader
-	//OnSubscriber reader1(participant ,"Topic1");
-	//OnSubscriber reader2(participant ,"Topic2");
-
-	std::cout << "test start" << std::endl;
-	//reader1.start();
-	//reader2.start();
 	
 	std::cout << "ui show" << std::endl;
 	ui.show();

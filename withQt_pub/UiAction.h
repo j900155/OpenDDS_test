@@ -29,6 +29,12 @@ class UiAction : public QDialog{
 		DDS::Subscriber_var        subscriber;
 		mT1::T1DataWriter_var	   dw1;
 		mT1::T1DataWriter_var	   dw2;
+		mT1::T1DataWriter_var	   dw3;
+		mT1::T1DataWriter_var	   dw4;
 		int id;
+		bool topicCheck1;
+		bool topicCheck2;
+		bool topicCheck3;
+		bool topicCheck4;
 };
 #endif

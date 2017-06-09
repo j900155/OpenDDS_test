@@ -16,17 +16,19 @@ class OnSubscriber : public QThread
 	Q_OBJECT
 
 	public:
-		OnSubscriber(DDS::DomainParticipant_var participant, char *get_topic);
+		//OnSubscriber(DDS::DomainParticipant_var participant, char *get_topic);
+		OnSubscriber(DDS::DomainParticipant_var participant, int number_);
 		virtual ~OnSubscriber();
 	protected:
 		void run();
 
 	signals:
-		void getMessage();
+		void getMessage(QString s, int t);
 	private:
 		DDS::Topic_var topic;
 		DDS::Subscriber_var subscriber;
 		mT1::T1DataReader_var dataReader;
+		int number;
 
 };
 #endif
