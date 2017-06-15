@@ -30,13 +30,14 @@ static const uint qt_meta_data_OnSubscriber[] = {
        1,       // signalCount
 
  // signals: signature, parameters, type, tag, flags
-      18,   14,   13,   13, 0x05,
+      27,   14,   13,   13, 0x05,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_OnSubscriber[] = {
-    "OnSubscriber\0\0s,t\0getMessage(QString,int)\0"
+    "OnSubscriber\0\0s,t,get_time\0"
+    "getMessage(QString,int,long)\0"
 };
 
 void OnSubscriber::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -45,7 +46,7 @@ void OnSubscriber::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         Q_ASSERT(staticMetaObject.cast(_o));
         OnSubscriber *_t = static_cast<OnSubscriber *>(_o);
         switch (_id) {
-        case 0: _t->getMessage((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 0: _t->getMessage((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< long(*)>(_a[3]))); break;
         default: ;
         }
     }
@@ -91,9 +92,9 @@ int OnSubscriber::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void OnSubscriber::getMessage(QString _t1, int _t2)
+void OnSubscriber::getMessage(QString _t1, int _t2, long _t3)
 {
-    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)) };
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
 }
 QT_END_MOC_NAMESPACE

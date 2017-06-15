@@ -29,8 +29,8 @@
 // TAO_IDL - Generated from
 // be/be_codegen.cpp:652
 
-#ifndef _TAO_IDL_T1S_P2YDD5_CPP_
-#define _TAO_IDL_T1S_P2YDD5_CPP_
+#ifndef _TAO_IDL_T1S_CWAKUB_CPP_
+#define _TAO_IDL_T1S_CWAKUB_CPP_
 
 
 #include "T1S.h"

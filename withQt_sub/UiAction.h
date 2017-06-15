@@ -13,7 +13,7 @@ class UiAction : public QDialog
 		virtual ~UiAction();
 
 	public slots:
-		void showMessage(QString text, int number);
+		void showMessage(QString text, int number, long get_time);
 
 	private:
 		Ui::Dialog	ui;

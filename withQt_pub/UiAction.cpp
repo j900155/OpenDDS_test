@@ -11,6 +11,7 @@
 #include "T1TypeSupportImpl.h"
 
 #include "UiAction.h"
+#include "time.h"
 UiAction::UiAction(DDS::DomainParticipant_var participant)
 : participant_(participant)
 {
@@ -166,6 +167,8 @@ UiAction::~UiAction()
 void UiAction::SendButtonClicked()
 {
 	std::cout << "Bueetonclicked" << std::endl;
+	time_t get_time;
+	get_time = time(NULL);
 	//write data1
 	if(!dw1)
 	{
@@ -177,6 +180,7 @@ void UiAction::SendButtonClicked()
 	mT1::T1 message1;
 	message1.T1_id = id;
 	message1.T1_S = s.c_str();
+	message1.T1_time = get_time;
 	if(topicCheck1)
 	{
 		std::cout << "topic " << dw1->get_topic() << std::endl;
@@ -194,6 +198,7 @@ void UiAction::SendButtonClicked()
 	mT1::T1 message2;
 	message2.T1_id = id;
 	message2.T1_S = s.c_str();
+	message2.T1_time = get_time;
 	if(topicCheck2)
 	{
 		std::cout << "topic " << dw2->get_topic() << std::endl;
@@ -211,6 +216,7 @@ void UiAction::SendButtonClicked()
 	mT1::T1 message3;
 	message3.T1_id = id;
 	message3.T1_S = s.c_str();
+	message3.T1_time = get_time;
 	if(topicCheck3)
 	{
 		std::cout << "topic " << dw3->get_topic() << std::endl;
@@ -228,6 +234,7 @@ void UiAction::SendButtonClicked()
 	mT1::T1 message4;
 	message4.T1_id = id;
 	message4.T1_S = s.c_str();
+	message4.T1_time = get_time;
 	if(topicCheck4)
 	{
 		std::cout << "topic " << dw4->get_topic() << std::endl;

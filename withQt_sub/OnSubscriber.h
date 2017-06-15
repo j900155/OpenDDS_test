@@ -23,7 +23,7 @@ class OnSubscriber : public QThread
 		void run();
 
 	signals:
-		void getMessage(QString s, int t);
+		void getMessage(QString s, int t, long get_time);
 	private:
 		DDS::Topic_var topic;
 		DDS::Subscriber_var subscriber;

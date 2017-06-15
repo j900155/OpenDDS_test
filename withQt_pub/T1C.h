@@ -28,8 +28,8 @@
 // TAO_IDL - Generated from
 // be/be_codegen.cpp:152
 
-#ifndef _TAO_IDL_T1C_DYNZRL_H_
-#define _TAO_IDL_T1C_DYNZRL_H_
+#ifndef _TAO_IDL_T1C_CWAKUB_H_
+#define _TAO_IDL_T1C_CWAKUB_H_
 
 #include /**/ "ace/pre.h"
 
@@ -102,6 +102,7 @@ namespace mT1
     
     ::CORBA::Long T1_id;
     ::TAO::String_Manager T1_S;
+    ::CORBA::Long T1_time;
   };
 
 // TAO_IDL - Generated from

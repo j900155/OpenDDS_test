@@ -47,7 +47,8 @@ TAO_BEGIN_VERSIONED_NAMESPACE_DECL
 {
   return
     (strm << _tao_aggregate.T1_id) &&
-    (strm << _tao_aggregate.T1_S.in ());
+    (strm << _tao_aggregate.T1_S.in ()) &&
+    (strm << _tao_aggregate.T1_time);
 }
 
 ::CORBA::Boolean operator>> (
@@ -56,7 +57,8 @@ TAO_BEGIN_VERSIONED_NAMESPACE_DECL
 {
   return
     (strm >> _tao_aggregate.T1_id) &&
-    (strm >> _tao_aggregate.T1_S.out ());
+    (strm >> _tao_aggregate.T1_S.out ()) &&
+    (strm >> _tao_aggregate.T1_time);
 }
 
 TAO_END_VERSIONED_NAMESPACE_DECL

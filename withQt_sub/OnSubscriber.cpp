@@ -115,10 +115,11 @@ void OnSubscriber::run()
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message id " << message.T1_id << std::endl;
 				std::cout << "message data " << message.T1_S << std::endl;
+				std::cout << "message time " << message.T1_time << std::endl;
 				char* s = message.T1_S._retn();
 				//std::string s = "test";
 				QString qtext = QString::fromStdString(s);
-				emit getMessage(qtext, number);
+				emit getMessage(qtext, number, message.T1_time);
 			}
 		}
 		usleep(10);

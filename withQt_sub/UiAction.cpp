@@ -30,10 +30,10 @@ UiAction::UiAction(DDS::DomainParticipant_var participant)
 	thread4 = new OnSubscriber(participant,4);
 	std::cout << "test start" << std::endl;	
 	//connect signal slot
-	connect(thread1, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
-	connect(thread2, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
-	connect(thread3, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
-	connect(thread4, SIGNAL(getMessage(QString, int)), this,SLOT(showMessage(QString, int)));
+	connect(thread1, SIGNAL(getMessage(QString, int, long)), this,SLOT(showMessage(QString, int, long)));
+	connect(thread2, SIGNAL(getMessage(QString, int, long)), this,SLOT(showMessage(QString, int, long)));
+	connect(thread3, SIGNAL(getMessage(QString, int, long)), this,SLOT(showMessage(QString, int, long)));
+	connect(thread4, SIGNAL(getMessage(QString, int, long)), this,SLOT(showMessage(QString, int, long)));
 	//connect signal slot
 	ui.setupUi(this);
 	thread1->start();
@@ -48,23 +48,29 @@ UiAction::~UiAction()
 	std::cout << "~UiAction" << std::endl;
 }
 
-void UiAction::showMessage(QString text, int number)
+void UiAction::showMessage(QString text, int number, long get_time)
 {
 	std::cout <<  number <<std::endl;
+	QString Stime = QString::number(get_time);
 	if(number ==1)
 	{
 		ui.Topic1Text->setText(text);
+		
+		ui.time1->setText(Stime);
 	}
 	else if(number ==2)
 	{
 		ui.Topic2Text->setText(text);
+		ui.time2->setText(Stime);
 	}
 	else if(number ==3)
 	{
 		ui.Topic3Text->setText(text);
+		ui.time3->setText(Stime);
 	}
 	else if(number ==4)
 	{
 		ui.Topic4Text->setText(text);
+		ui.time4->setText(Stime);
 	}
 }

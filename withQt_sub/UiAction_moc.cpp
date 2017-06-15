@@ -30,13 +30,14 @@ static const uint qt_meta_data_UiAction[] = {
        0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
-      22,   10,    9,    9, 0x0a,
+      31,   10,    9,    9, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_UiAction[] = {
-    "UiAction\0\0text,number\0showMessage(QString,int)\0"
+    "UiAction\0\0text,number,get_time\0"
+    "showMessage(QString,int,long)\0"
 };
 
 void UiAction::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -45,7 +46,7 @@ void UiAction::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         Q_ASSERT(staticMetaObject.cast(_o));
         UiAction *_t = static_cast<UiAction *>(_o);
         switch (_id) {
-        case 0: _t->showMessage((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 0: _t->showMessage((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2])),(*reinterpret_cast< long(*)>(_a[3]))); break;
         default: ;
         }
     }

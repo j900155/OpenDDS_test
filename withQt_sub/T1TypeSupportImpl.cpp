@@ -50,6 +50,10 @@ void gen_find_size(const mT1::T1& stru, size_t& size, size_t& padding)
   size += gen_max_marshaled_size(stru.T1_id);
   find_size_ulong(size, padding);
   size += ACE_OS::strlen(stru.T1_S.in()) + 1;
+  if ((size + padding) % 4) {
+    padding += 4 - ((size + padding) % 4);
+  }
+  size += gen_max_marshaled_size(stru.T1_time);
 }
 
 bool operator<<(Serializer& strm, const mT1::T1& stru)
@@ -57,7 +61,8 @@ bool operator<<(Serializer& strm, const mT1::T1& stru)
   ACE_UNUSED_ARG(strm);
   ACE_UNUSED_ARG(stru);
   return (strm << stru.T1_id)
-    && (strm << stru.T1_S.in());
+    && (strm << stru.T1_S.in())
+    && (strm << stru.T1_time);
 }
 
 bool operator>>(Serializer& strm, mT1::T1& stru)
@@ -65,7 +70,8 @@ bool operator>>(Serializer& strm, mT1::T1& stru)
   ACE_UNUSED_ARG(strm);
   ACE_UNUSED_ARG(stru);
   return (strm >> stru.T1_id)
-    && (strm >> stru.T1_S.out());
+    && (strm >> stru.T1_S.out())
+    && (strm >> stru.T1_time);
 }
 
 size_t gen_max_marshaled_size(const mT1::T1& stru, bool align)
@@ -178,6 +184,9 @@ struct MetaStructImpl<mT1::T1> : MetaStruct {
     if (std::strcmp(field, "T1_S") == 0) {
       return typed.T1_S.in();
     }
+    if (std::strcmp(field, "T1_time") == 0) {
+      return typed.T1_time;
+    }
     ACE_UNUSED_ARG(typed);
     throw std::runtime_error("Field " + OPENDDS_STRING(field) + " not found or its type is not supported (in struct mT1::T1)");
   }
@@ -206,6 +215,15 @@ struct MetaStructImpl<mT1::T1> : MetaStruct {
       }
       ser.skip(len);
     }
+    if (std::strcmp(field, "T1_time") == 0) {
+      ACE_CDR::Long val;
+      if (!(ser >> val)) {
+        throw std::runtime_error("Field 'T1_time' could not be deserialized");
+      }
+      return val;
+    } else {
+      ser.skip(1, 4);
+    }
     if (!field[0]) {
       return 0;
     }
@@ -221,12 +239,15 @@ struct MetaStructImpl<mT1::T1> : MetaStruct {
     if (std::strcmp(field, "T1_S") == 0) {
       return make_field_cmp(&T::T1_S, next);
     }
+    if (std::strcmp(field, "T1_time") == 0) {
+      return make_field_cmp(&T::T1_time, next);
+    }
     throw std::runtime_error("Field " + OPENDDS_STRING(field) + " not found or its type is not supported (in struct mT1::T1)");
   }
 
   const char** getFieldNames() const
   {
-    static const char* names[] = {"T1_id", "T1_S", 0};
+    static const char* names[] = {"T1_id", "T1_S", "T1_time", 0};
     return names;
   }
 
@@ -237,6 +258,9 @@ struct MetaStructImpl<mT1::T1> : MetaStruct {
     }
     if (std::strcmp(field, "T1_S") == 0) {
       return &static_cast<const T*>(stru)->T1_S;
+    }
+    if (std::strcmp(field, "T1_time") == 0) {
+      return &static_cast<const T*>(stru)->T1_time;
     }
     throw std::runtime_error("Field " + OPENDDS_STRING(field) + " not found or its type is not supported (in struct mT1::T1)");
   }
@@ -257,6 +281,10 @@ struct MetaStructImpl<mT1::T1> : MetaStruct {
       static_cast<T*>(lhs)->T1_S = *static_cast<const TAO::String_Manager*>(rhsMeta.getRawField(rhs, rhsFieldSpec));
       return;
     }
+    if (std::strcmp(field, "T1_time") == 0) {
+      static_cast<T*>(lhs)->T1_time = *static_cast<const CORBA::Long*>(rhsMeta.getRawField(rhs, rhsFieldSpec));
+      return;
+    }
     throw std::runtime_error("Field " + OPENDDS_STRING(field) + " not found or its type is not supported (in struct mT1::T1)");
   }
 
@@ -270,6 +298,9 @@ struct MetaStructImpl<mT1::T1> : MetaStruct {
     }
     if (std::strcmp(field, "T1_S") == 0) {
       return 0 == ACE_OS::strcmp(static_cast<const T*>(lhs)->T1_S.in(), static_cast<const T*>(rhs)->T1_S.in());
+    }
+    if (std::strcmp(field, "T1_time") == 0) {
+      return static_cast<const T*>(lhs)->T1_time == static_cast<const T*>(rhs)->T1_time;
     }
     throw std::runtime_error("Field " + OPENDDS_STRING(field) + " not found or its type is not supported (in struct mT1::T1)");
   }
