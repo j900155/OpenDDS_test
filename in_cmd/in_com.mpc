@@ -1,0 +1,8 @@
+porject(*idl): dcps
+{
+	requires += no_opendds_safety_profile
+	TypeSupport_Files
+	{
+		Messageer.idl
+	}
+}
