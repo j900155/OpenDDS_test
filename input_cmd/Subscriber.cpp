@@ -14,7 +14,7 @@
 int ACE_TMAIN(int argc, char *argv[])
 {
 	DDS::DomainParticipantFactory_var dpf = TheParticipantFactoryWithArgs(argc, argv);
-	DDS::DomainParticipant_var participant = dpf-> create_participant(42,
+	DDS::DomainParticipant_var participant = dpf-> create_participant(43,
 																	PARTICIPANT_QOS_DEFAULT,
 																	0,
 																	OpenDDS::DCPS::DEFAULT_STATUS_MASK);
@@ -98,6 +98,7 @@ int ACE_TMAIN(int argc, char *argv[])
 			{
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message data " << message.sendData << std::endl;
+				std::cout << "message count " << message.c << std::endl;
 				std::cout << "message time " << message.sendTime << std::endl;
 			}
 		}

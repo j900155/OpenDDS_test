@@ -6,5 +6,6 @@ module Messenger
 	{
 		string sendData;
 		long sendTime;
+		long c;
 	};
 };

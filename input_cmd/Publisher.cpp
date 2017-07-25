@@ -32,7 +32,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
     // Create DomainParticipant
     DDS::DomainParticipant_var participant =
-      dpf->create_participant(42,
+      dpf->create_participant(43,
                               PARTICIPANT_QOS_DEFAULT,
                               0,
                               OpenDDS::DCPS::DEFAULT_STATUS_MASK);
@@ -124,12 +124,18 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	gettimeofday(&tv,NULL);
     // Write samples
 	std::string text;
+	long c;
     Messenger::Message message;
 	while(true)
 	{
 		message.sendData = "";
 		std::cout << "send data"<< std::endl;
-		getline(std::cin, text);
+		//getline(std::cin, text);
+		std::cin >> text;
+		std::cin.ignore();
+		std::cout << "send count"<< std::endl;
+		std::cin >> c;
+		std::cout << "c" << c << std::endl;
 		if(text == "exit")
 		{
 			std::cout << "exit" << std::endl;
@@ -137,16 +143,17 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 		}
 		message.sendData = text.c_str();
 	    message.sendTime  = 0;
-
-		  gettimeofday(&tv,NULL);
+		gettimeofday(&tv,NULL);
+		message.sendTime = tv.tv_usec;
+		message.c = c;
 	      DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
-		  message.sendTime = tv.tv_usec;
 	      if (error != DDS::RETCODE_OK)
 		  {
 		    ACE_ERROR((LM_ERROR,
             ACE_TEXT("ERROR: %N:%l: main() -"),
             ACE_TEXT(" write returned %d!\n"), error));
 		}
+		std::cout << "ok"<< std::endl;
 	}
     // Wait for samples to be acknowledged
     DDS::Duration_t timeout = { 30, 0 };
