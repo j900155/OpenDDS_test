@@ -19,7 +19,8 @@
 #include "MessengerTypeSupportImpl.h"
 
 //time stamp
-//#include <sys/time.h>
+#include <sys/time.h>
+/*
 #include < time.h >
 #include <windows.h> 
 
@@ -33,8 +34,8 @@
 
 struct timezone
 {
-	int  tz_minuteswest; /* minutes W of Greenwich */
-	int  tz_dsttime;     /* type of dst correction */
+	int  tz_minuteswest;
+	int  tz_dsttime;
 };
 
 int gettimeofday(struct timeval *tv, struct timezone *tz)
@@ -51,9 +52,8 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 		tmpres <<= 32;
 		tmpres |= ft.dwLowDateTime;
 
-		/*converting file time to unix epoch*/
 		tmpres -= DELTA_EPOCH_IN_MICROSECS;
-		tmpres /= 10;  /*convert into microseconds*/
+		tmpres /= 10;
 		tv->tv_sec = (long)(tmpres / 1000000UL);
 		tv->tv_usec = (long)(tmpres % 1000000UL);
 	}
@@ -71,7 +71,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 	return 0;
 }
-
+*/
 #include <iostream>
 int
 ACE_TMAIN(int argc, ACE_TCHAR *argv[])

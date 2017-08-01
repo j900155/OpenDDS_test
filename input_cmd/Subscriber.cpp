@@ -9,14 +9,17 @@
 #include "dds/DCPS/StaticIncludes.h"
 
 #include "MessengerTypeSupportImpl.h"
-#include < time.h >
-#include <windows.h> 
 
-//#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-//#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-//#else
-//#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-//#endif
+//#include <time.h>
+//#include <windows.h> 
+#include <sys/time.h>
+#include <fstream>
+/*
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#endif
 
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
 #define DELTA_EPOCH_IN_MICROSECS  116444736000000000Ui64 // CORRECT
@@ -26,9 +29,10 @@
 
 struct timezone
 {
-	int  tz_minuteswest; /* minutes W of Greenwich */
-	int  tz_dsttime;     /* type of dst correction */
+	int  tz_minuteswest;
+	int  tz_dsttime;
 };
+
 int
 gettimeofday(struct timeval *tv, struct timezone *tz)
 {
@@ -44,9 +48,7 @@ gettimeofday(struct timeval *tv, struct timezone *tz)
 		tmpres <<= 32;
 		tmpres |= ft.dwLowDateTime;
 
-		/* convert into microseconds */
 		tmpres /= 10;
-		/* converting file time to unix epoch */
 		tmpres -= DELTA_EPOCH_IN_MICROSECS;
 		tv->tv_sec = (long)(tmpres / 1000000UL);
 		tv->tv_usec = (long)(tmpres % 1000000UL);
@@ -66,40 +68,40 @@ gettimeofday(struct timeval *tv, struct timezone *tz)
 	return 0;
 }
 
-//int gettimeofday(struct timeval *tv, struct timezone *tz)
-//{
-//	FILETIME ft;
-//	unsigned __int64 tmpres = 0;
-//	static int tzflag;
-//
-//	if (NULL != tv)
-//	{
-//		GetSystemTimeAsFileTime(&ft);
-//
-//		tmpres |= ft.dwHighDateTime;
-//		tmpres <<= 32;
-//		tmpres |= ft.dwLowDateTime;
-//
-//		/*converting file time to unix epoch*/
-//		tmpres -= DELTA_EPOCH_IN_MICROSECS;
-//		tmpres /= 10;  /*convert into microseconds*/
-//		tv->tv_sec = (long)(tmpres / 1000000UL);
-//		tv->tv_usec = (long)(tmpres % 1000000UL);
-//	}
-//
-//	if (NULL != tz)
-//	{
-//		if (!tzflag)
-//		{
-//			_tzset();
-//			tzflag++;
-//		}
-//		tz->tz_minuteswest = _timezone / 60;
-//		tz->tz_dsttime = _daylight;
-//	}
-//
-//	return 0;
-//}
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	FILETIME ft;
+	unsigned __int64 tmpres = 0;
+	static int tzflag;
+
+	if (NULL != tv)
+	{
+		GetSystemTimeAsFileTime(&ft);
+
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
+
+		tmpres -= DELTA_EPOCH_IN_MICROSECS;
+		tmpres /= 10;
+		tv->tv_sec = (long)(tmpres / 1000000UL);
+		tv->tv_usec = (long)(tmpres % 1000000UL);
+	}
+
+	if (NULL != tz)
+	{
+		if (!tzflag)
+		{
+			_tzset();
+			tzflag++;
+		}
+		tz->tz_minuteswest = _timezone / 60;
+		tz->tz_dsttime = _daylight;
+	}
+
+	return 0;
+}
+
 void usleep(__int64 usec)
 {
 	HANDLE timer;
@@ -112,7 +114,7 @@ void usleep(__int64 usec)
 	WaitForSingleObject(timer, INFINITE);
 	CloseHandle(timer);
 }
-
+*/
 int ACE_TMAIN(int argc, char *argv[])
 {
 	DDS::DomainParticipantFactory_var dpf = TheParticipantFactoryWithArgs(argc, argv);
@@ -189,6 +191,8 @@ int ACE_TMAIN(int argc, char *argv[])
 	DDS::ReturnCode_t error;
 	DDS::SampleInfo info;
 	Messenger::Message message;
+	fstream fp;
+	fp.open("test_log.text", std::ios::app);
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
@@ -203,6 +207,8 @@ int ACE_TMAIN(int argc, char *argv[])
 				gettimeofday(&tv, NULL);
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message data " << message.sendData << " message time " << tv.tv_usec - message.sendTime << std::endl;
+				fp << "message data " << message.sendData << " message time " << tv.tv_usec - message.sendTime << std::endl;
+
 			}
 		}
 		usleep(10);
