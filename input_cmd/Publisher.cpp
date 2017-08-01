@@ -19,7 +19,58 @@
 #include "MessengerTypeSupportImpl.h"
 
 //time stamp
-#include <sys/time.h>
+//#include <sys/time.h>
+#include < time.h >
+#include <windows.h> 
+
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#endif
+
+
+
+struct timezone
+{
+	int  tz_minuteswest; /* minutes W of Greenwich */
+	int  tz_dsttime;     /* type of dst correction */
+};
+
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	FILETIME ft;
+	unsigned __int64 tmpres = 0;
+	static int tzflag;
+
+	if (NULL != tv)
+	{
+		GetSystemTimeAsFileTime(&ft);
+
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
+
+		/*converting file time to unix epoch*/
+		tmpres -= DELTA_EPOCH_IN_MICROSECS;
+		tmpres /= 10;  /*convert into microseconds*/
+		tv->tv_sec = (long)(tmpres / 1000000UL);
+		tv->tv_usec = (long)(tmpres % 1000000UL);
+	}
+
+	if (NULL != tz)
+	{
+		if (!tzflag)
+		{
+			_tzset();
+			tzflag++;
+		}
+		tz->tz_minuteswest = _timezone / 60;
+		tz->tz_dsttime = _daylight;
+	}
+
+	return 0;
+}
 
 #include <iostream>
 int
@@ -32,7 +83,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
     // Create DomainParticipant
     DDS::DomainParticipant_var participant =
-      dpf->create_participant(43,
+      dpf->create_participant(42,
                               PARTICIPANT_QOS_DEFAULT,
                               0,
                               OpenDDS::DCPS::DEFAULT_STATUS_MASK);
@@ -60,6 +111,8 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	std::string topic_name;
 	std::cout << "topic name? ";
 	std::cin >> topic_name;
+	//std::cin.clear();
+	//std::cin.ignore(INT_MAX, '\n');
 	std::cout << "topic name " << topic_name << std::endl;
     CORBA::String_var type_name = ts->get_type_name();
     DDS::Topic_var topic =
@@ -124,28 +177,20 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	gettimeofday(&tv,NULL);
     // Write samples
 	std::string text;
-	long c;
     Messenger::Message message;
 	while(true)
 	{
 		message.sendData = "";
 		std::cout << "send data"<< std::endl;
-		//getline(std::cin, text);
-		std::cin >> text;
-		std::cin.ignore();
-		std::cout << "send count"<< std::endl;
-		std::cin >> c;
-		std::cout << "c" << c << std::endl;
+		getline(std::cin, text);
 		if(text == "exit")
 		{
 			std::cout << "exit" << std::endl;
 			break;
 		}
 		message.sendData = text.c_str();
-	    message.sendTime  = 0;
-		gettimeofday(&tv,NULL);
+		gettimeofday(&tv, NULL);
 		message.sendTime = tv.tv_usec;
-		message.c = c;
 	      DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
 	      if (error != DDS::RETCODE_OK)
 		  {
@@ -153,7 +198,6 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
             ACE_TEXT("ERROR: %N:%l: main() -"),
             ACE_TEXT(" write returned %d!\n"), error));
 		}
-		std::cout << "ok"<< std::endl;
 	}
     // Wait for samples to be acknowledged
     DDS::Duration_t timeout = { 30, 0 };

@@ -25,3 +25,6 @@ C:\Users\Shun\Desktop\WindowsFormsApplication1 - 複製\WindowsFormsApplication1
 C:\Users\Shun\Desktop\WindowsFormsApplication1 - 複製\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Form1.resources
 C:\Users\Shun\Desktop\WindowsFormsApplication1 - 複製\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
 C:\Users\Shun\Desktop\WindowsFormsApplication1 - 複製\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.csproj.GenerateResource.Cache
+C:\Users\Shun\Documents\OpenDDS_test\input_cmd\UI\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
+C:\Users\Shun\Documents\OpenDDS_test\input_cmd\UI\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.exe
+C:\Users\Shun\Documents\OpenDDS_test\input_cmd\UI\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.pdb

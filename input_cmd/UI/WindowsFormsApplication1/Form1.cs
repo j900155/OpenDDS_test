@@ -19,11 +19,17 @@ namespace WindowsFormsApplication1
     public partial class Form1 : Form
     {
         // Input Queue (執行續訊息交換)
-        static ConcurrentQueue<string>[] Input_Topic_Queue = new ConcurrentQueue<string>[4];
+        static ConcurrentQueue<T_Data>[] Input_Topic_Queue = new ConcurrentQueue<T_Data>[4];
         // process list 
         static List<Process> pss = new List<Process>();
         delegate void SetTextCallback(Label Label, string Resultt);
+        static long[] counts = {0,0,0,0 };
 
+        struct T_Data
+        {
+            public string data;
+            public long count;
+        }
         class T_Topic
         {
             private string _topic;
@@ -67,7 +73,7 @@ namespace WindowsFormsApplication1
             // 初始化Topic queue
             for (int i = 0; i < 4; i++)
             {
-                Input_Topic_Queue[i] = new ConcurrentQueue<string>();
+                Input_Topic_Queue[i] = new ConcurrentQueue<T_Data>();
             }
 
             // 設定 Topic
@@ -82,12 +88,39 @@ namespace WindowsFormsApplication1
                 if (!String.IsNullOrEmpty(outLine.Data))
                 {
                     string data = outLine.Data;
-                    int tindex = data.IndexOf("message data");
+                    string cstr = "message count ";
+                    string estr = ";message time ";
+                    int tindex = data.IndexOf(cstr);
+                    int eindex = data.IndexOf(estr);
                     System.Diagnostics.Debug.WriteLine(outLine.Data);
                     if (tindex >= 0)
                     {
+                        int len = eindex - (tindex + cstr.Length);
+                        long count = Convert.ToInt64(data.Substring(tindex + cstr.Length, len));
                         SetText(label7, outLine.Data);
                         System.Diagnostics.Debug.WriteLine(outLine.Data);
+                        T_Data da = new T_Data();
+                        da.data = this.textBox1.Text;
+                        if (checkBox5.Checked == true)
+                        {
+                            if (count != -1 && count >= Convert.ToInt64(textBox6.Text) && Convert.ToInt64(textBox6.Text) != 0)
+                            {
+                                counts[0] = -1;
+                                return;
+                            }
+                            if (timer1_count == Convert.ToInt64(textBox5.Text) && Convert.ToInt64(textBox5.Text) != 0)
+                            {
+                                counts[0] = -1;
+                                return;
+                            }
+
+                            if (count == counts[0] + 1)
+                            {
+                                counts[0] = counts[0] + 2;
+                                da.count = counts[0];
+                                Input_Topic_Queue[0].Enqueue(da);
+                            }
+                        }
                     }
                 }
             };
@@ -98,12 +131,38 @@ namespace WindowsFormsApplication1
                 if (!String.IsNullOrEmpty(outLine.Data))
                 {
                     string data = outLine.Data;
-                    int tindex = data.IndexOf("message data");
+                    string cstr = "message count ";
+                    string estr = ";message time ";
+                    int tindex = data.IndexOf(cstr);
+                    int eindex = data.IndexOf(estr);
                     System.Diagnostics.Debug.WriteLine(outLine.Data);
                     if (tindex >= 0)
                     {
                         SetText(label8, outLine.Data);
                         System.Diagnostics.Debug.WriteLine(outLine.Data);
+                        int len = eindex - (tindex + cstr.Length);
+                        long count = Convert.ToInt64(data.Substring(tindex + cstr.Length, len));
+                        T_Data da = new T_Data();
+                        da.data = this.textBox3.Text;
+                        if (checkBox5.Checked == true)
+                        {
+                            if (count != -1 && count >= Convert.ToInt64(textBox8.Text) && Convert.ToInt64(textBox8.Text) != 0)
+                            {
+                                counts[1] = -1;
+                                return;
+                            }
+                            if (timer2_count == Convert.ToInt64(textBox7.Text) && Convert.ToInt64(textBox7.Text) != 0)
+                            {
+                                counts[1] = -1;
+                                return;
+                            }
+                            if (count == counts[1] + 1)
+                            {
+                                counts[1] = counts[1] + 2;
+                                da.count = counts[1];
+                                Input_Topic_Queue[1].Enqueue(da);
+                            }
+                        }
                     }
                 }
             };
@@ -114,12 +173,39 @@ namespace WindowsFormsApplication1
                 if (!String.IsNullOrEmpty(outLine.Data))
                 {
                     string data = outLine.Data;
-                    int tindex = data.IndexOf("message data");
+                    string cstr = "message count ";
+                    string estr = ";message time ";
+                    int tindex = data.IndexOf(cstr);
+                    int eindex = data.IndexOf(estr);
                     System.Diagnostics.Debug.WriteLine(outLine.Data);
                     if (tindex >= 0)
                     {
                         SetText(label9, outLine.Data);
                         System.Diagnostics.Debug.WriteLine(outLine.Data);
+                        System.Diagnostics.Debug.WriteLine(outLine.Data);
+                        int len = eindex - (tindex + cstr.Length);
+                        long count = Convert.ToInt64(data.Substring(tindex + cstr.Length, len));
+                        T_Data da = new T_Data();
+                        da.data = this.textBox2.Text;
+                        if (checkBox5.Checked == true)
+                        {
+                            if (count != -1 && count >= Convert.ToInt64(textBox10.Text) && Convert.ToInt64(textBox10.Text) != 0)
+                            {
+                                counts[2] = -1;
+                                return;
+                            }
+                            if (timer3_count == Convert.ToInt64(textBox9.Text) && Convert.ToInt64(textBox9.Text) != 0)
+                            {
+                                counts[2] = -1;
+                                return;
+                            }
+                            if (count == counts[2] + 1)
+                            {
+                                counts[2] = counts[2] + 2;
+                                da.count = counts[2];
+                                Input_Topic_Queue[2].Enqueue(da);
+                            }
+                        }
                     }
                 }
             };
@@ -130,16 +216,42 @@ namespace WindowsFormsApplication1
                 if (!String.IsNullOrEmpty(outLine.Data))
                 {
                     string data = outLine.Data;
-                    int tindex = data.IndexOf("message data");
+                    string cstr = "message count ";
+                    string estr = ";message time ";
+                    int tindex = data.IndexOf(cstr);
+                    int eindex = data.IndexOf(estr);
                     System.Diagnostics.Debug.WriteLine(outLine.Data);
                     if (tindex >= 0)
                     {
                         SetText(label10, outLine.Data);
                         System.Diagnostics.Debug.WriteLine(outLine.Data);
+                        System.Diagnostics.Debug.WriteLine(outLine.Data);
+                        int len = eindex - (tindex + cstr.Length);
+                        long count = Convert.ToInt64(data.Substring(tindex + cstr.Length, len));
+                        T_Data da = new T_Data();
+                        da.data = this.textBox4.Text;
+                        if (checkBox5.Checked == true)
+                        {
+                            if (count != -1 && count >= Convert.ToInt64(textBox12.Text) && Convert.ToInt64(textBox12.Text) != 0)
+                            {
+                                counts[3] = -1;
+                                return;
+                            }
+                            if (timer4_count == Convert.ToInt64(textBox11.Text) && Convert.ToInt64(textBox11.Text) != 0)
+                            {
+                                counts[3] = -1;
+                                return;
+                            }
+                            if (count == counts[3] + 1)
+                            {
+                                counts[3] = counts[3] + 2;
+                                da.count = counts[3];
+                                Input_Topic_Queue[3].Enqueue(da);
+                            }
+                        }
                     }
                 }
             };
-
             // 啟動執行續監控push,subscribe
             Thread oThread1 = new Thread(new ParameterizedThreadStart(push));
             // 啟用執行續並提供所需資訊
@@ -165,18 +277,18 @@ namespace WindowsFormsApplication1
         private void recevie(object t_topic)
         {
             // subsciber 程式位置
-            String subscirberPath = "D:\\OpenDDS\\input_cmd\\Release\\subscriber.exe";
+            String subscirberPath = "D:\\OpenDDS\\OpenDDS_test-master\\input_cmd\\Release\\subscriber.exe";
             // 執行 subsciber
-            this.RunSub(subscirberPath, "-DCPSConfigfile D:\\OpenDDS\\input_cmd\\rtps.ini", t_topic);
+            this.RunSub(subscirberPath, "-DCPSConfigfile D:\\OpenDDS\\OpenDDS_test-master\\input_cmd\\rtps.ini", t_topic);
         }
 
         // 執行publisher (t_topic 為publisher的所需資訊)
         private void push(object t_topic)
         {
             // publihser 程式位置
-            String publisherPath = "D:\\OpenDDS\\input_cmd\\Release\\publisher.exe";
+            String publisherPath = "D:\\OpenDDS\\OpenDDS_test-master\\input_cmd\\Release\\publisher.exe";
             // 執行 publihser
-            this.Run(publisherPath, "-DCPSConfigfile D:\\OpenDDS\\input_cmd\\rtps.ini", t_topic);
+            this.Run(publisherPath, "-DCPSConfigfile D:\\OpenDDS\\OpenDDS_test-master\\input_cmd\\rtps.ini", t_topic);
         }
 
         public void Run(string fileName, string args, object top)
@@ -210,14 +322,17 @@ namespace WindowsFormsApplication1
             // 輸入要傳送的TOPIC
             sw.WriteLine(tt.topic);
             sw.Flush();
-            String input;
+            T_Data input;
             while (true)
             {
                 // 確任是否在queue中有無要傳送的訊息
                 if (Input_Topic_Queue[tt.id] != null && Input_Topic_Queue[tt.id].TryDequeue(out input))
                 {
                     // 傳送訊息
-                    sw.WriteLine(input);
+                    sw.WriteLine(input.data);
+                    sw.Flush();
+                    // 傳送訊息
+                    sw.WriteLine(input.count);
                     sw.Flush();
                 }
                 Thread.Sleep(5);
@@ -277,21 +392,37 @@ namespace WindowsFormsApplication1
         private void button1_Click(object sender, EventArgs e)
         {
             // 判斷是否傳送訊息
+            for (int i = 0; i < 4; i++)
+            {
+                counts[i] = 0;
+            }
             if (checkBox1.Checked == true)
             {
-                Input_Topic_Queue[0].Enqueue(this.textBox1.Text);
+                T_Data data = new T_Data();
+                data.data = this.textBox1.Text;
+                data.count = 0;
+                Input_Topic_Queue[0].Enqueue(data);
             }
             if (checkBox2.Checked == true)
             {
-                Input_Topic_Queue[1].Enqueue(this.textBox3.Text);
+                T_Data data = new T_Data();
+                data.data = this.textBox3.Text;
+                data.count = 0;
+                Input_Topic_Queue[1].Enqueue(data);
             }
             if (checkBox3.Checked == true)
             {
-                Input_Topic_Queue[2].Enqueue(this.textBox2.Text);
+                T_Data data = new T_Data();
+                data.data = this.textBox2.Text;
+                data.count = 0;
+                Input_Topic_Queue[2].Enqueue(data);
             }
             if (checkBox4.Checked == true)
             {
-                Input_Topic_Queue[3].Enqueue(this.textBox4.Text);
+                T_Data data = new T_Data();
+                data.data = this.textBox4.Text;
+                data.count = 0;
+                Input_Topic_Queue[3].Enqueue(data);
             }
         }
 
@@ -310,6 +441,215 @@ namespace WindowsFormsApplication1
             {
                 Label.Text = text;
             }
+        }
+
+
+        long timer1_count, timer2_count, timer3_count, timer4_count;
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (counts[0] == -1)
+            {
+                timer1.Stop();
+                button2.Text = "開始";
+            }
+            if (checkBox5.Checked == true)
+            {
+                timer1_count++;
+            }
+            else
+            {
+                T_Data data = new T_Data();
+                data.data = this.textBox1.Text;
+                data.count = counts[0]++;
+                Input_Topic_Queue[0].Enqueue(data);
+            }
+
+        }
+
+        private void timer2_Tick(object sender, EventArgs e)
+        {
+            if (counts[1] == -1)
+            {
+                timer2.Stop();
+                button3.Text = "開始";
+            }
+            if (checkBox5.Checked == true)
+            {
+                timer2_count++;
+            }
+            else
+            {
+                T_Data data = new T_Data();
+                data.data = this.textBox3.Text;
+                data.count = counts[1]++;
+                Input_Topic_Queue[1].Enqueue(data);
+            }
+        }
+
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+            if (counts[2] == -1)
+            {
+                timer3.Stop();
+                button4.Text = "開始";
+            }
+            if (checkBox5.Checked == true)
+            {
+                timer3_count++;
+            }
+            else
+            {
+                T_Data data = new T_Data();
+                data.data = this.textBox2.Text;
+                data.count = counts[2]++;
+                Input_Topic_Queue[2].Enqueue(data);
+            }
+        }
+
+        private void timer4_Tick(object sender, EventArgs e)
+        {
+            if (counts[3] == -1)
+            {
+                timer4.Stop();
+                button5.Text = "開始";
+            }
+            if (checkBox5.Checked == true)
+            {
+                timer4_count++;
+            }
+            else
+            {
+                T_Data data = new T_Data();
+                data.data = this.textBox4.Text;
+                data.count = counts[3]++;
+                Input_Topic_Queue[3].Enqueue(data);
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (!this.timer1.Enabled)
+            {
+                counts[0] = 0;
+                if (checkBox5.Checked == true)
+                {
+                    T_Data data = new T_Data();
+                    data.data = this.textBox1.Text;
+                    data.count = ++counts[0];
+                    Input_Topic_Queue[0].Enqueue(data);
+                    timer1_count = 0;
+                    this.timer1.Interval = 1000;
+                }
+                else
+                {
+                    this.timer1.Interval = Convert.ToInt32(textBox5.Text);
+                }
+                this.timer1.Start();
+                ((Button)sender).Text = "停止";
+            }
+            else
+            {
+                this.timer1.Stop();
+                ((Button)sender).Text = "開始";
+            }
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (!this.timer2.Enabled)
+            {
+                counts[1] = 0;
+                if (checkBox5.Checked == true)
+                {
+                    T_Data data = new T_Data();
+                    data.data = this.textBox3.Text;
+                    data.count = ++counts[1];
+                    Input_Topic_Queue[1].Enqueue(data);
+                    timer2_count = 0;
+                    this.timer2.Interval = 1000;
+                }
+                else
+                {
+                    this.timer2.Interval = Convert.ToInt32(textBox7.Text);
+                }
+                this.timer2.Start();
+                ((Button)sender).Text = "停止";
+            }
+            else
+            {
+                this.timer2.Stop();
+                ((Button)sender).Text = "開始";
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (!this.timer3.Enabled)
+            {
+                counts[2] = 0;
+                if (checkBox5.Checked == true)
+                {
+                    T_Data data = new T_Data();
+                    data.data = this.textBox2.Text;
+                    data.count = ++counts[2];
+                    Input_Topic_Queue[2].Enqueue(data);
+                    timer3_count = 0;
+                    this.timer3.Interval = 1000;
+                }
+                else
+                {
+                    this.timer3.Interval = Convert.ToInt32(textBox9.Text);
+                }
+                this.timer3.Start();
+                ((Button)sender).Text = "停止";
+            }
+            else
+            {
+                this.timer3.Stop();
+                ((Button)sender).Text = "開始";
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (!this.timer4.Enabled)
+            {
+                counts[3] = 0;
+                if (checkBox5.Checked == true)
+                {
+                    T_Data data = new T_Data();
+                    data.data = this.textBox4.Text;
+                    data.count = ++counts[3];
+                    Input_Topic_Queue[3].Enqueue(data);
+                    timer4_count = 0;
+                    this.timer4.Interval = 1000;
+                }
+                else
+                {
+                    this.timer4.Interval = Convert.ToInt32(textBox11.Text);
+                }
+                this.timer4.Start();
+                ((Button)sender).Text = "停止";
+            }
+            else
+            {
+                this.timer4.Stop();
+                ((Button)sender).Text = "開始";
+            }
+        }
+
+        private void num_TextChange(object sender, KeyPressEventArgs e)
+        {
+            if (((int)e.KeyChar < 48 | (int)e.KeyChar > 57) & (int)e.KeyChar != 8)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void checkBox5_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
