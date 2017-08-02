@@ -19,60 +19,57 @@
 #include "MessengerTypeSupportImpl.h"
 
 //time stamp
-#include <sys/time.h>
-/*
-#include < time.h >
+//#include <sys/time.h>
+
+#include <iostream>
+
+
 #include <windows.h> 
-
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#else
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#endif
+#include <time.h>
 
 
+/* FILETIME of Jan 1 1970 00:00:00. */
+static const unsigned __int64 epoch = ((unsigned __int64)116444736000000000ULL);
 
-struct timezone
+/*
+* timezone information is stored outside the kernel so tzp isn't used anymore.
+*
+* Note: this function is not for Win32 high precision timing purpose. See
+* elapsed_time().
+*/
+int
+gettimeofday(struct timeval * tp, struct timezone * tzp)
 {
-	int  tz_minuteswest;
-	int  tz_dsttime;
-};
+	FILETIME    file_time;
+	SYSTEMTIME  system_time;
+	ULARGE_INTEGER ularge;
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
-{
-	FILETIME ft;
-	unsigned __int64 tmpres = 0;
-	static int tzflag;
+	GetSystemTime(&system_time);
+	SystemTimeToFileTime(&system_time, &file_time);
+	ularge.LowPart = file_time.dwLowDateTime;
+	ularge.HighPart = file_time.dwHighDateTime;
 
-	if (NULL != tv)
-	{
-		GetSystemTimeAsFileTime(&ft);
-
-		tmpres |= ft.dwHighDateTime;
-		tmpres <<= 32;
-		tmpres |= ft.dwLowDateTime;
-
-		tmpres -= DELTA_EPOCH_IN_MICROSECS;
-		tmpres /= 10;
-		tv->tv_sec = (long)(tmpres / 1000000UL);
-		tv->tv_usec = (long)(tmpres % 1000000UL);
-	}
-
-	if (NULL != tz)
-	{
-		if (!tzflag)
-		{
-			_tzset();
-			tzflag++;
-		}
-		tz->tz_minuteswest = _timezone / 60;
-		tz->tz_dsttime = _daylight;
-	}
+	tp->tv_sec = (long)((ularge.QuadPart - epoch) / 10000000L);
+	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
 
 	return 0;
 }
-*/
-#include <iostream>
+
+void usleep(__int64 usec)
+{
+	HANDLE timer;
+	LARGE_INTEGER ft;
+
+	ft.QuadPart = -(10 * usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+
+	timer = CreateWaitableTimer(NULL, TRUE, NULL);
+	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+	WaitForSingleObject(timer, INFINITE);
+	CloseHandle(timer);
+}
+
+
+
 int
 ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 {
@@ -83,7 +80,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
     // Create DomainParticipant
     DDS::DomainParticipant_var participant =
-      dpf->create_participant(42,
+      dpf->create_participant(43,
                               PARTICIPANT_QOS_DEFAULT,
                               0,
                               OpenDDS::DCPS::DEFAULT_STATUS_MASK);
@@ -111,8 +108,6 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	std::string topic_name;
 	std::cout << "topic name? ";
 	std::cin >> topic_name;
-	//std::cin.clear();
-	//std::cin.ignore(INT_MAX, '\n');
 	std::cout << "topic name " << topic_name << std::endl;
     CORBA::String_var type_name = ts->get_type_name();
     DDS::Topic_var topic =
@@ -177,20 +172,28 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	gettimeofday(&tv,NULL);
     // Write samples
 	std::string text;
+	long c;
     Messenger::Message message;
 	while(true)
 	{
 		message.sendData = "";
 		std::cout << "send data"<< std::endl;
-		getline(std::cin, text);
+		//getline(std::cin, text);
+		std::cin >> text;
+		std::cin.ignore();
+		std::cout << "send count"<< std::endl;
+		std::cin >> c;
+		std::cout << "c" << c << std::endl;
 		if(text == "exit")
 		{
 			std::cout << "exit" << std::endl;
 			break;
 		}
 		message.sendData = text.c_str();
-		gettimeofday(&tv, NULL);
+	    message.sendTime  = 0;
+		gettimeofday(&tv,NULL);
 		message.sendTime = tv.tv_usec;
+		message.c = c;
 	      DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
 	      if (error != DDS::RETCODE_OK)
 		  {
@@ -198,6 +201,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
             ACE_TEXT("ERROR: %N:%l: main() -"),
             ACE_TEXT(" write returned %d!\n"), error));
 		}
+		std::cout << "ok"<< std::endl;
 	}
     // Wait for samples to be acknowledged
     DDS::Duration_t timeout = { 30, 0 };

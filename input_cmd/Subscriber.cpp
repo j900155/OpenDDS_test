@@ -10,94 +10,33 @@
 
 #include "MessengerTypeSupportImpl.h"
 
-//#include <time.h>
-//#include <windows.h> 
-#include <sys/time.h>
-#include <fstream>
+#include <windows.h> 
+#include <time.h>
+
+
+/* FILETIME of Jan 1 1970 00:00:00. */
+static const unsigned __int64 epoch = ((unsigned __int64)116444736000000000ULL);
+
 /*
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#else
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#endif
-
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#define DELTA_EPOCH_IN_MICROSECS  116444736000000000Ui64 // CORRECT
-#else
-#define DELTA_EPOCH_IN_MICROSECS  116444736000000000ULL // CORRECT
-#endif
-
-struct timezone
-{
-	int  tz_minuteswest;
-	int  tz_dsttime;
-};
-
+* timezone information is stored outside the kernel so tzp isn't used anymore.
+*
+* Note: this function is not for Win32 high precision timing purpose. See
+* elapsed_time().
+*/
 int
-gettimeofday(struct timeval *tv, struct timezone *tz)
+gettimeofday(struct timeval * tp, struct timezone * tzp)
 {
-	FILETIME ft;
-	unsigned __int64 tmpres = 0;
-	static int tzflag = 0;
+	FILETIME    file_time;
+	SYSTEMTIME  system_time;
+	ULARGE_INTEGER ularge;
 
-	if (NULL != tv)
-	{
-		GetSystemTimeAsFileTime(&ft);
+	GetSystemTime(&system_time);
+	SystemTimeToFileTime(&system_time, &file_time);
+	ularge.LowPart = file_time.dwLowDateTime;
+	ularge.HighPart = file_time.dwHighDateTime;
 
-		tmpres |= ft.dwHighDateTime;
-		tmpres <<= 32;
-		tmpres |= ft.dwLowDateTime;
-
-		tmpres /= 10;
-		tmpres -= DELTA_EPOCH_IN_MICROSECS;
-		tv->tv_sec = (long)(tmpres / 1000000UL);
-		tv->tv_usec = (long)(tmpres % 1000000UL);
-	}
-
-	if (NULL != tz)
-	{
-		if (!tzflag)
-		{
-			_tzset();
-			tzflag++;
-		}
-		tz->tz_minuteswest = _timezone / 60;
-		tz->tz_dsttime = _daylight;
-	}
-
-	return 0;
-}
-
-int gettimeofday(struct timeval *tv, struct timezone *tz)
-{
-	FILETIME ft;
-	unsigned __int64 tmpres = 0;
-	static int tzflag;
-
-	if (NULL != tv)
-	{
-		GetSystemTimeAsFileTime(&ft);
-
-		tmpres |= ft.dwHighDateTime;
-		tmpres <<= 32;
-		tmpres |= ft.dwLowDateTime;
-
-		tmpres -= DELTA_EPOCH_IN_MICROSECS;
-		tmpres /= 10;
-		tv->tv_sec = (long)(tmpres / 1000000UL);
-		tv->tv_usec = (long)(tmpres % 1000000UL);
-	}
-
-	if (NULL != tz)
-	{
-		if (!tzflag)
-		{
-			_tzset();
-			tzflag++;
-		}
-		tz->tz_minuteswest = _timezone / 60;
-		tz->tz_dsttime = _daylight;
-	}
+	tp->tv_sec = (long)((ularge.QuadPart - epoch) / 10000000L);
+	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
 
 	return 0;
 }
@@ -114,11 +53,11 @@ void usleep(__int64 usec)
 	WaitForSingleObject(timer, INFINITE);
 	CloseHandle(timer);
 }
-*/
+
 int ACE_TMAIN(int argc, char *argv[])
 {
 	DDS::DomainParticipantFactory_var dpf = TheParticipantFactoryWithArgs(argc, argv);
-	DDS::DomainParticipant_var participant = dpf-> create_participant(42,
+	DDS::DomainParticipant_var participant = dpf-> create_participant(43,
 																	PARTICIPANT_QOS_DEFAULT,
 																	0,
 																	OpenDDS::DCPS::DEFAULT_STATUS_MASK);
@@ -191,23 +130,19 @@ int ACE_TMAIN(int argc, char *argv[])
 	DDS::ReturnCode_t error;
 	DDS::SampleInfo info;
 	Messenger::Message message;
-	fstream fp;
-	fp.open("test_log.text", std::ios::app);
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
 		if(error == DDS::RETCODE_OK)
 		{
-			std::cout << "SampleInfo.sample_rank = " << info.sample_rank << std::endl;
-		    std::cout << "SampleInfo.instance_state = " << info.instance_state << std::endl;
+			//std::cout << "SampleInfo.sample_rank = " << info.sample_rank << std::endl;
+		 //   std::cout << "SampleInfo.instance_state = " << info.instance_state << std::endl;
 			if(info.valid_data)	
 			{
-				//time
-				struct timeval tv;
-				gettimeofday(&tv, NULL);
 				std::cout<< "topic name " << topic->get_name() << std::endl;
-				std::cout << "message data " << message.sendData << " message time " << tv.tv_usec - message.sendTime << std::endl;
-				fp << "message data " << message.sendData << " message time " << tv.tv_usec - message.sendTime << std::endl;
+				std::cout << "message count " << message.c;
+				std::cout << ";message time " << message.sendTime;
+				std::cout << ";message data " << message.sendData << std::endl;
 
 			}
 		}
