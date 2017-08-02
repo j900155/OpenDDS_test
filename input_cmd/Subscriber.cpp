@@ -139,9 +139,11 @@ int ACE_TMAIN(int argc, char *argv[])
 		 //   std::cout << "SampleInfo.instance_state = " << info.instance_state << std::endl;
 			if(info.valid_data)	
 			{
+				gettimeofday(&tv,NULL);
+ 				
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message count " << message.c;
-				std::cout << ";message time " << message.sendTime;
+				std::cout << ";message time " << tv.tv_usec - message.sendTime;
 				std::cout << ";message data " << message.sendData << std::endl;
 
 			}
