@@ -19,13 +19,17 @@
 #include "MessengerTypeSupportImpl.h"
 
 //time stamp
-//#include <sys/time.h>
 
+#ifdef linxu
+
+#include <sys/time.h>
 #include <iostream>
+#endif
 
+#ifdef _WIN32
 
-#include <windows.h> 
-#include <time.h>
+//#include <windows.h> 
+//#include <time.h>
 
 
 /* FILETIME of Jan 1 1970 00:00:00. */
@@ -67,7 +71,7 @@ void usleep(__int64 usec)
 	WaitForSingleObject(timer, INFINITE);
 	CloseHandle(timer);
 }
-
+#endif
 
 
 int

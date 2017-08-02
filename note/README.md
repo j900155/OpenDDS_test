@@ -1,13 +1,19 @@
-oci   https://github.com/DOCGroup/MPC/tree/master/docs
-make GNUmakefile all
-tao_idl  create  
+oci   https://github.com/DOCGroup/MPC/tree/master/docs <br>
+
+build *.idl
+```shlel
+tao_idl *.idl  create  
 	MessengerC.cpp
 	MessengerC.h
 	MessengerC.inl
 	MessengerS.cpp
 	MessengerS.h
+```
 
-opendds_idl create 
+```shell
+opendds_idl i-Sa -St 
+```
+create 
 	MessengerTypeSupport.idl
 	MessengerTypeSupportImpl.cpp
 	MessengerTypeSupportImpl.h
@@ -24,8 +30,6 @@ opendds_idl create
 ./subscriber -DCPSConfigFile rtps.ini
 
 
-build *.idl
-tao_idl filename =>> filenameTypeSupport.idl filenameTypeSupportImpl.h filenameTypeSupportImpl.cpp
 makefile
 mwc.pl -type gnuace
 
