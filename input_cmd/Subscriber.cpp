@@ -130,6 +130,7 @@ int ACE_TMAIN(int argc, char *argv[])
 	DDS::ReturnCode_t error;
 	DDS::SampleInfo info;
 	Messenger::Message message;
+	struct timeval tv;
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
