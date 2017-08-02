@@ -10,6 +10,14 @@
 
 #include "MessengerTypeSupportImpl.h"
 
+#include <fstream>
+
+#ifdef linux
+#include <sys/time.h>
+#endif
+
+#ifdef _WIN32
+
 #include <windows.h> 
 #include <time.h>
 
@@ -53,7 +61,7 @@ void usleep(__int64 usec)
 	WaitForSingleObject(timer, INFINITE);
 	CloseHandle(timer);
 }
-
+#endif
 int ACE_TMAIN(int argc, char *argv[])
 {
 	DDS::DomainParticipantFactory_var dpf = TheParticipantFactoryWithArgs(argc, argv);
@@ -131,6 +139,8 @@ int ACE_TMAIN(int argc, char *argv[])
 	DDS::SampleInfo info;
 	Messenger::Message message;
 	struct timeval tv;
+	fstream fp;
+	fp.open("test_log.text", std::ios::app);
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
@@ -141,11 +151,13 @@ int ACE_TMAIN(int argc, char *argv[])
 			if(info.valid_data)	
 			{
 				gettimeofday(&tv,NULL);
- 				
+				long nowTime = tv.tv_sec * 1000000 + tv.tv_usec;
+				long diff = (nowTime - message.sendTime) % 10000000;
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message count " << message.c;
-				std::cout << ";message time " << tv.tv_usec+ tv.tv_sec*1000000 - message.sendTime;
+				std::cout << ";message time " << diff;
 				std::cout << ";message data " << message.sendData << std::endl;
+				fp << "message_data " << message.sendData << " message_time " << diff  << std::endl;
 
 			}
 		}

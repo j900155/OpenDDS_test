@@ -17,19 +17,16 @@
 #include "dds/DCPS/StaticIncludes.h"
 
 #include "MessengerTypeSupportImpl.h"
+#include <iostream>
 
 //time stamp
-
-#ifdef linxu
-
+#ifdef linux
 #include <sys/time.h>
-#include <iostream>
 #endif
 
 #ifdef _WIN32
-
-//#include <windows.h> 
-//#include <time.h>
+#include <windows.h> 
+#include <time.h>
 
 
 /* FILETIME of Jan 1 1970 00:00:00. */
@@ -196,7 +193,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 		message.sendData = text.c_str();
 	    message.sendTime  = 0;
 		gettimeofday(&tv,NULL);
-		message.sendTime = tv.tv_usec+ tv.tv_sec*1000000;
+		message.sendTime = (tv.tv_usec+ tv.tv_sec*1000000) % 10000000;
 		message.c = c;
 	      DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
 	      if (error != DDS::RETCODE_OK)
