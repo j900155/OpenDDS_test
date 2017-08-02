@@ -192,7 +192,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 		message.sendData = text.c_str();
 	    message.sendTime  = 0;
 		gettimeofday(&tv,NULL);
-		message.sendTime = tv.tv_usec;
+		message.sendTime = tv.tv_usec+ tv.tv_sec*1000000;
 		message.c = c;
 	      DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
 	      if (error != DDS::RETCODE_OK)
