@@ -140,16 +140,22 @@ int ACE_TMAIN(int argc, char *argv[])
 	Messenger::Message message;
 	struct timeval tv;
 	fstream fp;
-	fp.open("test_log.text", std::ios::app);
+	fp.open("test_log.txt", std::ios::app);
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
+
 		if(error == DDS::RETCODE_OK)
 		{
 			//std::cout << "SampleInfo.sample_rank = " << info.sample_rank << std::endl;
 		 //   std::cout << "SampleInfo.instance_state = " << info.instance_state << std::endl;
 			if(info.valid_data)	
-			{
+			{		
+				if(message.c == -1)
+				{
+				    std::cout << "exit" << std::endl;
+				    break;
+				}
 				gettimeofday(&tv,NULL);
 				long nowTime = tv.tv_sec * 1000000 + tv.tv_usec;
 				long diff = (nowTime - message.sendTime) % 10000000;
@@ -164,6 +170,12 @@ int ACE_TMAIN(int argc, char *argv[])
 		usleep(10);
 
 	}
+    // Clean-up!
+    participant->delete_contained_entities();
+    dpf->delete_participant(participant);
+
+    TheServiceParticipant->shutdown();
+
 	return 0;
 }
 
