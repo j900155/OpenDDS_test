@@ -205,6 +205,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
             ACE_TEXT(" write returned %d!\n"), error));
 		}
 		std::cout << "ok"<< std::endl;
+		usleep(3000);
 	}
     // Wait for samples to be acknowledged
     DDS::Duration_t timeout = { 30, 0 };
