@@ -1,0 +1,27 @@
+project(*idl):dcps{
+	TypeSupport_Files{
+		Messenger.idl
+	}
+	custom_only = 1
+}
+project(*publisher):dcpsexe, dcps_tcp{
+	exename = publisher
+	after += *idl
+	TypeSupport_Files{
+		Messenger.idl
+	}
+	Source_Files{
+		Publisher.cpp,
+	}
+}
+
+project(*subscriber):dcpsexe, dcps_tcp{
+	exename = subscriber
+	after += *publisher
+	TypeSupport_Files{
+		Messenger.idl
+	}
+	Source_Files{
+		Subscriber.cpp
+	}
+}

@@ -38,7 +38,8 @@ mwc.pl -type gnuace
 ./subscriber -DCPSConfigFile rtps.ini
 ```
 
-
+Qos的資料再這裏面  
+/home/zack/github/OpenDDS/dds/DdsDcpsCore.idl
 
 
 

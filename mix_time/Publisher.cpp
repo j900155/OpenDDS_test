@@ -26,7 +26,7 @@ int
 ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 {
   int fake_argc = 3;
-  ACE_TCHAR *fake_argv[] = {"./publisher","-DCPSConfigFile", 							"rtps.ini"};
+  ACE_TCHAR *fake_argv[] = {"./publisher" ,"-DCPSConfigFile" ,"rtps.ini"};
   const char *send_from;
 //  std::cout << "argv[0]" << argv[0] <<  std::endl;
 //  std::cout << "argc" << argc <<  std::endl;
