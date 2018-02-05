@@ -185,17 +185,19 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 		std::cout << "send count"<< std::endl;
 		std::cin >> c;
 		std::cout << "c" << c << std::endl;
+		message.sendData = text.c_str();
 		if(text == "exit")
 		{
 			std::cout << "exit" << std::endl;
+			c = -1;
+			DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
 			break;
 		}
-		message.sendData = text.c_str();
-	    message.sendTime  = 0;
+	   	message.sendTime  = 0;
 		gettimeofday(&tv,NULL);
 		message.sendTime = (tv.tv_usec+ tv.tv_sec*1000000) % 10000000;
 		message.c = c;
-	      DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
+	        DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
 	      if (error != DDS::RETCODE_OK)
 		  {
 		    ACE_ERROR((LM_ERROR,
@@ -203,6 +205,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
             ACE_TEXT(" write returned %d!\n"), error));
 		}
 		std::cout << "ok"<< std::endl;
+		usleep(3000);
 	}
     // Wait for samples to be acknowledged
     DDS::Duration_t timeout = { 30, 0 };
