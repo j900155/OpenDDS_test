@@ -44,4 +44,6 @@ Qos的資料再這裏面
 
 
 
+## static
+Currently, static discovery can only be used for endpoints using the RTPS UDP transport  
 
