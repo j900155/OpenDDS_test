@@ -41,7 +41,43 @@ mwc.pl -type gnuace
 Qos的資料再這裏面  
 /home/zack/github/OpenDDS/dds/DdsDcpsCore.idl
 
+## staitc ini setting
+### 注意!!Currently, static discovery can only be used for endpoints using the RTPS UDP transport
+1.設定 common
+```idl
+[common]
+DCPSGlobalTransportConfig=myconfig
+DCPSDefaultDiscovery=dis
+DCPSDebugLevel=0
+```
+2.設定 discovery transport 和 config
+```idl
+[config/myconfig]
+transports=the_rtps_transport
+[transport/the_rtps_transport]
+transport_type=rtps_udp
+TTL=3
+[rtps_discovery/dis]
+TTL=5
+```
 
+3. 設定 topic endpoint (reader)
+``` idl
+[topic/mytopic]
+type_name=Messenger::Message
+name=A
+[endpoint/myreader]
+type=reader
+domain=34
+participant=0123456789ab //length 16 hex
+entity=aabbcc //length 6 hex
+topic=mytopic
+```
+4.datareader qos 設定  
+```idl
+[datareaderqos/readerqos]
+reliability.kind=RELIABLE
+```
 
 
 ## static
