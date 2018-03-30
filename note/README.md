@@ -73,6 +73,11 @@ participant=0123456789ab //length 16 hex
 entity=aabbcc //length 6 hex
 topic=mytopic
 ```
+4.datareader qos 設定  
+```idl
+[datareaderqos/readerqos]
+reliability.kind=RELIABLE
+```
 
 
 
