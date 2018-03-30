@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ping dashboard</title>
+    <script language="javascript" src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript">
+      var pingStatus = false;
+      setInterval(function(){
+        if(pingStatus){
+          ping()
+        }
+      }, 3000);
+
+      function ping(){
+        $.ajax({
+          type:"POST",
+          url:"ping",
+          dataType:"text",
+          data:{
+            ip:$("#serverIp").val()
+          },
+          success: function (data) {
+            console.log(data);
+             $("#pingResultMsg").append(data+"<br>");
+          },
+          error:function(data){
+            console.log(data);
+            return false;
+          }
+        });
+      }
+
+      function pingStart(){
+        pingStatus = true;
+        console.log(pingStatus);
+        $("#pingStart").attr("disabled", true);
+        $("#pingStop").attr("disabled", false);
+      }
+
+      function pingStop(){
+        pingStatus = false;
+        console.log(pingStatus);
+        $("#pingStart").attr("disabled", false);
+        $("#pingStop").attr("disabled", true);
+      }
+
+      function clearMsg(){
+        $("#clearPingResultMsg").click(function(){
+          $("#pingResultMsg").html("");
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div>
+      WebSiteURL:<input type="text" size="50" id="serverIp">
+    </div>
+    <div>
+      <input type="button" id="pingStart" onclick="pingStart()" value="PingStart">
+      <input type="button" id="pingStop" onclick="pingStop()" value="PingStop" disabled="disabled">
+      <input type="button" id="clearPingResultMsg" onclick="clearMsg()" value="ClearPingResultMsg">
+    </div>
+    <div id="pingResultMsg"></div>
+  </body>
+</html>
