@@ -1,0 +1,11 @@
+module Messenger
+{
+	#pragma DCPS_DATA_TYPE "Messenger::Message"
+	#pragma DCPS_DATA_KEY "Messenger::Message sendTime"
+	struct Message
+	{
+		string sendData;
+		long sendTime;
+		long c;
+	};
+};
