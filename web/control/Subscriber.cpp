@@ -13,20 +13,20 @@
 #include <fstream>
 
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-
-#ifdef linux
 #include <sys/time.h>
-#endif
 
 int ACE_TMAIN(int argc, char *argv[])
 {
 	DDS::DomainParticipantFactory_var dpf = TheParticipantFactoryWithArgs(argc, argv);
-	DDS::DomainParticipant_var participant = dpf-> create_participant(43,
-																	PARTICIPANT_QOS_DEFAULT,
-																	0,
-																	OpenDDS::DCPS::DEFAULT_STATUS_MASK);
+	DDS::DomainParticipant_var participant = dpf-> 
+		create_participant(
+				43,
+				PARTICIPANT_QOS_DEFAULT,
+				0,
+				OpenDDS::DCPS::DEFAULT_STATUS_MASK);
 	std::cout << "participant" << participant->get_domain_id() << std::endl;
 
 	Messenger::MessageTypeSupport_var ts = new Messenger::MessageTypeSupportImpl;
@@ -91,22 +91,20 @@ int ACE_TMAIN(int argc, char *argv[])
 		std::cerr <<"create dataReader fail"<< std::endl;
 	}
 
-	std::cout<< "topic name " << topic->get_name() << std::endl;
-
 	DDS::ReturnCode_t error;
 	DDS::SampleInfo info;
 	Messenger::Message message;
 	struct timeval tv;
 	int get_count = 0;
 	int delay_us = 1000;
-	std::cout << "dealy us";
+	std::cout << "delay us" << std::endl;
 	std::cin >> delay_us;
 	fstream fp;
 	std::string fileName;
-	std::cout << "file name";
+	std::cout << "file name" << std::endl;
 	std::cin >> fileName;
 	fileName +=".txt";
-	fp.open(fileName, std::ios::app);
+	fp.open(fileName, std::fstream::in | std::fstream::app);
 	//socket create
 	std::cout << "socket start" << std::endl;
 	int sockfd = 0;
@@ -165,6 +163,7 @@ int ACE_TMAIN(int argc, char *argv[])
 		usleep(delay_us);
 
 	}
+	close(sockfd);
     // Clean-up!
     participant->delete_contained_entities();
     dpf->delete_participant(participant);
