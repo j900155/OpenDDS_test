@@ -139,8 +139,16 @@ int ACE_TMAIN(int argc, char *argv[])
 	DDS::SampleInfo info;
 	Messenger::Message message;
 	struct timeval tv;
+	int get_count = 0;
+	int delay_us = 1000;
+	std::cout << "delay us\n";
+	std::cin >> delay_us;
 	fstream fp;
-	fp.open("test_log.txt", std::ios::app);
+	std::string fileName;
+	std::cout << "file name\n";
+	std::cin >> fileName;
+	fileName +=".txt";
+	fp.open(fileName, std::ios::app);
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
@@ -156,18 +164,22 @@ int ACE_TMAIN(int argc, char *argv[])
 				    std::cout << "exit" << std::endl;
 				    break;
 				}
+				get_count ++;
 				gettimeofday(&tv,NULL);
-				long nowTime = tv.tv_sec * 1000000 + tv.tv_usec;
-				long diff = (nowTime - message.sendTime) % 10000000;
+				long nowTime = (tv.tv_sec%100) * 1000000 + tv.tv_usec;
+				long diff = nowTime - message.sendTime;
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message count " << message.c;
-				std::cout << ";message time " << diff;
+				std::cout << "message time " << message.sendTime;
+				std::cout << "time " << nowTime;
+				std::cout << ";message diff " << diff;
 				std::cout << ";message data " << message.sendData << std::endl;
-				fp << "message_data " << message.sendData << " message_time " << diff  << std::endl;
+				std::cout << "get_count" << get_count << std::endl;
+				fp << "message_data," << message.sendData << ",message_time," << diff  << std::endl;
 
 			}
 		}
-		usleep(10);
+		usleep(delay_us);
 
 	}
     // Clean-up!

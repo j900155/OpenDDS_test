@@ -22,6 +22,7 @@
 //time stamp
 #ifdef linux
 #include <sys/time.h>
+#include <unistd.h>
 #endif
 
 #ifdef _WIN32
@@ -107,7 +108,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
     // Create Topic (Movie Discussion List)
 	std::string topic_name;
-	std::cout << "topic name? ";
+	std::cout << "topic name? \n";
 	std::cin >> topic_name;
 	std::cout << "topic name " << topic_name << std::endl;
     CORBA::String_var type_name = ts->get_type_name();
@@ -162,52 +163,90 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
                        -1);
     }
 
-    // Block until Subscriber is available
-    DDS::StatusCondition_var condition = writer->get_statuscondition();
-    condition->set_enabled_statuses(DDS::PUBLICATION_MATCHED_STATUS);
-
-    DDS::WaitSet_var ws = new DDS::WaitSet;
 
 	//time
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
     // Write samples
 	std::string text;
-	long c;
+	long c = 0;
+	int delay_us = 100000;
+	std::cout << "delay us" << std::endl;
+	std::cin >> delay_us;
+	std::cout << "send data"<< std::endl;
+	std::cin >> text;
     Messenger::Message message;
+	DDS::ReturnCode_t error;
+	//wait for subscriber
 	while(true)
 	{
-		message.sendData = "";
-		std::cout << "send data"<< std::endl;
-		//getline(std::cin, text);
-		std::cin >> text;
-		std::cin.ignore();
-		std::cout << "send count"<< std::endl;
-		std::cin >> c;
-		std::cout << "c" << c << std::endl;
-		message.sendData = text.c_str();
-		if(text == "exit")
+		DDS::PublicationMatchedStatus matches;
+		if(writer->get_publication_matched_status(matches) != DDS::RETCODE_OK)
 		{
-			std::cout << "exit" << std::endl;
-			c = -1;
-			DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
+			 ACE_ERROR_RETURN((LM_ERROR,
+                        ACE_TEXT("ERROR: %N:%l: main() -")
+                        ACE_TEXT(" get_publication_matched_status faild!\n")),
+                       -1);
+	
+		}
+		if(matches.current_count >=1)
+		{
 			break;
 		}
-	   	message.sendTime  = 0;
+	}
+	long t;
+	gettimeofday(&tv,NULL);
+	t = tv.tv_sec;
+	while(true)
+	{
+	
+		//std::cin.ignore();
+		//std::cout << "send count"<< std::endl;
+		//std::cin >> c;
+		//std::cout << "c" << c << std::endl;
+		c++;
+		//message.sendData = "AAAAAAAA";
+		if(text == "exit")
+		{
+	        //error = message_writer->write(message, DDS::HANDLE_NIL);
+			std::cout << "exit\n";
+			break;
+		}
+		
+		if((tv.tv_sec - t) > 5)
+		{
+			break;
+		}
+		
+		message.sendData = text.c_str();
+		/*
+		if(c > 100)
+		{
+		    message.sendData = "exit";
+			message.c = -1;
+	        error = message_writer->write(message, DDS::HANDLE_NIL);
+			std::cout << "exit" << std::endl;
+			break;
+		}*/
+	    //message.sendTime  = 0;
 		gettimeofday(&tv,NULL);
-		message.sendTime = (tv.tv_usec+ tv.tv_sec*1000000) % 10000000;
+		message.sendTime = (tv.tv_usec+ (tv.tv_sec%100)*1000000);
 		message.c = c;
-	        DDS::ReturnCode_t error = message_writer->write(message, DDS::HANDLE_NIL);
+	    error = message_writer->write(message, DDS::HANDLE_NIL);
 	      if (error != DDS::RETCODE_OK)
 		  {
 		    ACE_ERROR((LM_ERROR,
             ACE_TEXT("ERROR: %N:%l: main() -"),
             ACE_TEXT(" write returned %d!\n"), error));
 		}
-		std::cout << "ok"<< std::endl;
-		usleep(3000);
+		std::cout << "ok " << c  << std::endl;
+		usleep(delay_us);
 	}
+	message.sendData = "end";
+	message.c = -1;
+	error = message_writer->write(message, DDS::HANDLE_NIL);
     // Wait for samples to be acknowledged
+	std::cout << "end" << std::endl;	
     DDS::Duration_t timeout = { 30, 0 };
     if (message_writer->wait_for_acknowledgments(timeout) != DDS::RETCODE_OK) {
       ACE_ERROR_RETURN((LM_ERROR,
@@ -215,7 +254,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
                         ACE_TEXT(" wait_for_acknowledgments failed!\n")),
                        -1);
     }
-
+	std::cout << "clean" << std::endl;
     // Clean-up!
     participant->delete_contained_entities();
     dpf->delete_participant(participant);
