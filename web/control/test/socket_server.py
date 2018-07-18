@@ -15,7 +15,8 @@ recv_port = 9807
 bind_ip = "0.0.0.0"
 def main():
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    send_socket.bind((bind_ip,send_port))
+    #send_socket.bind((bind_ip,send_port))
+    send_socket.bind((bind_ip,recv_port))
     send_port.listen(2)
     
     (clientsocket, address) = send_port.accept()

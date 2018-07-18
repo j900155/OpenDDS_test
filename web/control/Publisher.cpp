@@ -180,8 +180,9 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 				send(sockfd,"alive",5,0);
 			}
 			gettimeofday(&tv,NULL);
-			int sec = tv.tv_sec%100;
-			message.sendTime = (tv.tv_usec + sec*1000000);
+			//int sec = tv.tv_sec%100;
+			//message.sendTime = (tv.tv_usec + sec*1000000);
+			message.sendTime = tv.tv_sec;
 			message.c = c;
 			error = message_writer->write(message, DDS::HANDLE_NIL);
 			  if (error != DDS::RETCODE_OK)

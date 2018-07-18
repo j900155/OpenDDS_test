@@ -63,8 +63,10 @@ class run_sub(threading.Thread):
                 delay_time = str(int(self.set_sub_time* 1000)) + "\n"
                 sub.stdin.write(delay_time)
             elif(get_return == "exit\n"):
+                sub.kill()
                 break
             elif(get_return =="file name\n"):
-                sub.stdout.write("run_test\n")
+                print "sub" + get_return
+                sub.stdin.write("run_test\n")
         return 0
 

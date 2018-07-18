@@ -104,7 +104,7 @@ int ACE_TMAIN(int argc, char *argv[])
 	std::cout << "file name" << std::endl;
 	std::cin >> fileName;
 	fileName +=".txt";
-	fp.open(fileName, std::fstream::in | std::fstream::app);
+	fp.open(fileName, std::fstream::out | std::fstream::app);
 	//socket create
 	std::cout << "socket start" << std::endl;
 	int sockfd = 0;

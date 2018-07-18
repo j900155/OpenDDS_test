@@ -76,7 +76,8 @@ def publish_socket(pub_connect, first_data):
                     print "pub dds status {}".format(pub_dds.isAlive())
             elif jdata["active"] == "exit":
                 if str(type(pub_dds)) == "<class 'run_dds.run_pub'>":
-                    pub_dds.send("exit")
+                    #pub_dds.send("exit")
+                    pub_dds_connect.send("exit")
                     pub_dds ==""
                 break
         elif str(type(pub_dds)) == "<class 'run_dds.run_pub'>":
@@ -93,12 +94,18 @@ def subscriber_dds(sub_connect):
     global sub_client_connect
     while(1):
         data = sub_connect.recv(4096)
-        print data
+        print "subscriber dds {}".format(data)
+        if len(data) < 1:
+            print (len(data))
+            print "subscriber_dds break"
+            break
+
+        for sub_client in sub_client_connect:
+            print sub_client
+            sub_client.send(data)
         #TODO data paser
         #...
 
-        for client in sub_client_connect:
-            client.send(data)
 
 def subscriber_socket(sub_connect, first_data):
     """
@@ -110,11 +117,12 @@ def subscriber_socket(sub_connect, first_data):
         kill dds subscriber {"active":"exit"}
     """
     global sub_dds
-    global sub_client_connect
-    sub_client_connect.append(sub_connect)
+    #global sub_client_connect
+    #sub_connect.settimeout(0.0)
+    #sub_client_connect.append(sub_connect)
     data = first_data
     while(1):
-        data = sub_connect.recv(4096)
+        #data = sub_connect.recv(4096)
         print("sub recv data {}".format(data))
         if len(data) < 1:
             print data
@@ -138,24 +146,27 @@ def subscriber_socket(sub_connect, first_data):
                 else:
                     print("exist")
             elif jdata["active"] =="status":
-                if type(sub_dds) == type("str"):
-                    print "sub dds status {}".format("not create")
+                print ("sub type".format(type(sub_dds)))
+                if str(type(sub_dds)) == "<class 'run_dds.run_sub'>":
+                        print "sub dds status {}".format(sub_dds.isAlive())
                 else:
-                    print "sub dds status {}".format(sub_dds.isAlive())
+                    print "sub dds status {}".format("not create")
             elif jdata["active"] == "exit":
                 if str(type(pub_dds)) == "<class 'run_dds.run_sub'>":
                     sub_dds_connect.send("exit")
                     sub_dds_connect = ""
                 break
+        data = sub_connect.recv(4096)
  
 def creat_subscriber_server():
+    global sub_client_connect
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     except socket.err, msg:
         sys.stderr.write("ERROR {} ".format(msg))
         sys.exit(1)
     server.bind((HOST, sub_PORT))
-    server.listen(2)
+    server.listen(10)
     print ("start subscriber server port {}".format(sub_PORT))
     while(1):
         conn, addr = server.accept()
@@ -165,6 +176,8 @@ def creat_subscriber_server():
         if data =="subscriber":
             sub_server = threading.Thread(target=subscriber_dds,args=[conn])
             sub_server.start()
+        elif data =="recv":
+            sub_client_connect.append(conn)
         else:
             sub_client = threading.Thread(target=subscriber_socket,args=[conn, data])
             sub_client.start()
@@ -176,7 +189,7 @@ def create_publish_server():
         sys.stderr.write("ERROR {} ".format(msg))
         sys.exit(1)
     server.bind((HOST, pub_PORT))
-    server.listen(2)
+    server.listen(10)
     print ("start publish server port {}".format(pub_PORT))
     while(1):
         conn, addr = server.accept()

@@ -21,8 +21,7 @@ def main():
         if d=="-1":
             send_socket.close()
             break
-        else:
-            send_socket.send(d)
+        send_socket.send(d)
         print send_socket.recv(4096)
 
 if __name__ =="__main__":
