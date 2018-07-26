@@ -2,7 +2,7 @@ oci   https://github.com/DOCGroup/MPC/tree/master/docs <br>
 
 build *.idl
 
-```shlel
+```shell
 tao_idl *.idl  create  
 	MessengerC.cpp
 	MessengerC.h

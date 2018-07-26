@@ -20,58 +20,12 @@
 #include <iostream>
 
 //time stamp
-#ifdef linux
 #include <sys/time.h>
 #include <unistd.h>
-#endif
 
-#ifdef _WIN32
-#include <windows.h> 
-#include <time.h>
-
-
-/* FILETIME of Jan 1 1970 00:00:00. */
-static const unsigned __int64 epoch = ((unsigned __int64)116444736000000000ULL);
-
-/*
-* timezone information is stored outside the kernel so tzp isn't used anymore.
-*
-* Note: this function is not for Win32 high precision timing purpose. See
-* elapsed_time().
-*/
-int
-gettimeofday(struct timeval * tp, struct timezone * tzp)
-{
-	FILETIME    file_time;
-	SYSTEMTIME  system_time;
-	ULARGE_INTEGER ularge;
-
-	GetSystemTime(&system_time);
-	SystemTimeToFileTime(&system_time, &file_time);
-	ularge.LowPart = file_time.dwLowDateTime;
-	ularge.HighPart = file_time.dwHighDateTime;
-
-	tp->tv_sec = (long)((ularge.QuadPart - epoch) / 10000000L);
-	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
-
-	return 0;
-}
-
-void usleep(__int64 usec)
-{
-	HANDLE timer;
-	LARGE_INTEGER ft;
-
-	ft.QuadPart = -(10 * usec); // Convert to 100 nanosecond interval, negative value indicates relative time
-
-	timer = CreateWaitableTimer(NULL, TRUE, NULL);
-	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
-	WaitForSingleObject(timer, INFINITE);
-	CloseHandle(timer);
-}
-#endif
-
-
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 int
 ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 {
@@ -162,8 +116,30 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
                         ACE_TEXT(" _narrow failed!\n")),
                        -1);
     }
+	std::cout << "socket start" << std::endl;
+	int sockfd = 0;
+	sockfd = socket(AF_INET,SOCK_STREAM,0);
+	if(sockfd ==-1)
+	{
+		std::cout << "create socket error \n";
+		return -1;
+	}
+	struct sockaddr_in remote_addr;
+	const int BUFFSIZE = 200;
+	char buf[BUFFSIZE];
+	int len;
+	memset(&remote_addr,0,sizeof(remote_addr));
+	memset(buf,0,sizeof(buf));
+	remote_addr.sin_family=AF_INET;
+	remote_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
+	remote_addr.sin_port=htons(9808);
 
-
+	if(connect(sockfd,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr))<0)
+	{
+		std::cout << "sock connect err" << std::endl;
+		return -1;
+	}
+	send(sockfd,"publisher",9,0);
 	//time
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
@@ -171,79 +147,58 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	std::string text;
 	long c = 0;
 	int delay_us = 100000;
-	std::cout << "delay us" << std::endl;
-	std::cin >> delay_us;
-	std::cout << "send data"<< std::endl;
-	std::cin >> text;
-    Messenger::Message message;
+	int i;
+	//std::cout << "delay us" << std::endl;
+	//std::cin >> delay_us;
+	Messenger::Message message;
 	DDS::ReturnCode_t error;
-	//wait for subscriber
-	while(true)
-	{
-		DDS::PublicationMatchedStatus matches;
-		if(writer->get_publication_matched_status(matches) != DDS::RETCODE_OK)
-		{
-			 ACE_ERROR_RETURN((LM_ERROR,
-                        ACE_TEXT("ERROR: %N:%l: main() -")
-                        ACE_TEXT(" get_publication_matched_status faild!\n")),
-                       -1);
-	
-		}
-		if(matches.current_count >=1)
-		{
-			break;
-		}
-	}
-	long t;
 	gettimeofday(&tv,NULL);
-	t = tv.tv_sec;
+//	t = tv.tv_sec;
 	while(true)
 	{
-	
-		//std::cin.ignore();
-		//std::cout << "send count"<< std::endl;
-		//std::cin >> c;
-		//std::cout << "c" << c << std::endl;
-		c++;
-		//message.sendData = "AAAAAAAA";
-		if(text == "exit")
+		len = recv(sockfd, buf,BUFFSIZE,0);
+		if(len > 0)
 		{
-	        //error = message_writer->write(message, DDS::HANDLE_NIL);
-			std::cout << "exit\n";
-			break;
+			std::cout <<len << " " << buf << std::endl;
+			c++;
+			//message.sendData = "AAAAAAAA";
+
+			for(i=0;i<len;i++)
+			{
+				text += buf[i];
+			}
+			message.sendData = text.c_str();
+
+			if(strcmp(buf,"exit") == 0)
+			{
+				error = message_writer->write(message, DDS::HANDLE_NIL);
+				std::cout << "exit\n";
+				break;
+			}
+			else if(strcmp(buf,"heartbeat")==0)
+			{
+				send(sockfd,"alive",5,0);
+			}
+			gettimeofday(&tv,NULL);
+			//int sec = tv.tv_sec%100;
+			//message.sendTime = (tv.tv_usec + sec*1000000);
+			message.sendTime = tv.tv_sec;
+			message.c = c;
+			error = message_writer->write(message, DDS::HANDLE_NIL);
+			  if (error != DDS::RETCODE_OK)
+			  {
+				ACE_ERROR((LM_ERROR,
+				ACE_TEXT("ERROR: %N:%l: main() -"),
+				ACE_TEXT(" write returned %d!\n"), error));
+			}
+			std::cout << "ok " << c  << std::endl;
+			memset(buf,0,BUFFSIZE);
+			text = "";
 		}
-		
-		if((tv.tv_sec - t) > 5)
-		{
-			break;
-		}
-		
-		message.sendData = text.c_str();
-		/*
-		if(c > 100)
-		{
-		    message.sendData = "exit";
-			message.c = -1;
-	        error = message_writer->write(message, DDS::HANDLE_NIL);
-			std::cout << "exit" << std::endl;
-			break;
-		}*/
-	    //message.sendTime  = 0;
-		gettimeofday(&tv,NULL);
-		message.sendTime = (tv.tv_usec+ (tv.tv_sec%100)*1000000);
-		message.c = c;
-	    error = message_writer->write(message, DDS::HANDLE_NIL);
-	      if (error != DDS::RETCODE_OK)
-		  {
-		    ACE_ERROR((LM_ERROR,
-            ACE_TEXT("ERROR: %N:%l: main() -"),
-            ACE_TEXT(" write returned %d!\n"), error));
-		}
-		std::cout << "ok " << c  << std::endl;
 		usleep(delay_us);
 	}
+	close(sockfd);
 	message.sendData = "end";
-	message.c = -1;
 	error = message_writer->write(message, DDS::HANDLE_NIL);
     // Wait for samples to be acknowledged
 	std::cout << "end" << std::endl;	
@@ -265,6 +220,5 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
     e._tao_print_exception("Exception caught in main():");
     return -1;
   }
-
   return 0;
 }

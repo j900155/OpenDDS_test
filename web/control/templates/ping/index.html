@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="utf-8" />
+		<title>Ping</title>
+	</head>
+	<body>
+		<script>
+			console.log("abc");
+			function pingStart()
+			{
+				console.log("start")
+				var xhttp = new	XMLHttpRequest();
+				xhttp.onreadystatechange = function()
+				{
+					if(xmlHttp.readyStat ==4 && xmlHttp.status ==200)
+					{
+						console.log(xmlHttp.responseTxt);
+					}
+					xmlHttp.open("GET","http://127.0.0.1:5000/ping/getip?ip=8.8.8.8")
+					xmlHttp.send(NULL);
+				}
+			}
+		</script>
+	
+    <input type="button" id="pingStart" onclick="pingStart()" value="PingStart">
+	</body>
+</html>

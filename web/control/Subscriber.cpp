@@ -12,63 +12,21 @@
 
 #include <fstream>
 
-#ifdef linux
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 #include <sys/time.h>
-#endif
 
-#ifdef _WIN32
-
-#include <windows.h> 
-#include <time.h>
-
-
-/* FILETIME of Jan 1 1970 00:00:00. */
-static const unsigned __int64 epoch = ((unsigned __int64)116444736000000000ULL);
-
-/*
-* timezone information is stored outside the kernel so tzp isn't used anymore.
-*
-* Note: this function is not for Win32 high precision timing purpose. See
-* elapsed_time().
-*/
-int
-gettimeofday(struct timeval * tp, struct timezone * tzp)
-{
-	FILETIME    file_time;
-	SYSTEMTIME  system_time;
-	ULARGE_INTEGER ularge;
-
-	GetSystemTime(&system_time);
-	SystemTimeToFileTime(&system_time, &file_time);
-	ularge.LowPart = file_time.dwLowDateTime;
-	ularge.HighPart = file_time.dwHighDateTime;
-
-	tp->tv_sec = (long)((ularge.QuadPart - epoch) / 10000000L);
-	tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
-
-	return 0;
-}
-
-void usleep(__int64 usec)
-{
-	HANDLE timer;
-	LARGE_INTEGER ft;
-
-	ft.QuadPart = -(10 * usec); // Convert to 100 nanosecond interval, negative value indicates relative time
-
-	timer = CreateWaitableTimer(NULL, TRUE, NULL);
-	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
-	WaitForSingleObject(timer, INFINITE);
-	CloseHandle(timer);
-}
-#endif
 int ACE_TMAIN(int argc, char *argv[])
 {
 	DDS::DomainParticipantFactory_var dpf = TheParticipantFactoryWithArgs(argc, argv);
-	DDS::DomainParticipant_var participant = dpf-> create_participant(43,
-																	PARTICIPANT_QOS_DEFAULT,
-																	0,
-																	OpenDDS::DCPS::DEFAULT_STATUS_MASK);
+	DDS::DomainParticipant_var participant = dpf-> 
+		create_participant(
+				43,
+				PARTICIPANT_QOS_DEFAULT,
+				0,
+				OpenDDS::DCPS::DEFAULT_STATUS_MASK);
 	std::cout << "participant" << participant->get_domain_id() << std::endl;
 
 	Messenger::MessageTypeSupport_var ts = new Messenger::MessageTypeSupportImpl;
@@ -133,55 +91,79 @@ int ACE_TMAIN(int argc, char *argv[])
 		std::cerr <<"create dataReader fail"<< std::endl;
 	}
 
-	std::cout<< "topic name " << topic->get_name() << std::endl;
-
 	DDS::ReturnCode_t error;
 	DDS::SampleInfo info;
 	Messenger::Message message;
 	struct timeval tv;
 	int get_count = 0;
 	int delay_us = 1000;
-	std::cout << "delay us\n";
+	std::cout << "delay us" << std::endl;
 	std::cin >> delay_us;
 	fstream fp;
 	std::string fileName;
-	std::cout << "file name\n";
+	std::cout << "file name" << std::endl;
 	std::cin >> fileName;
 	fileName +=".txt";
-	fp.open(fileName, std::ios::app);
+	fp.open(fileName, std::fstream::out | std::fstream::app);
+	//socket create
+	std::cout << "socket start" << std::endl;
+	int sockfd = 0;
+	sockfd = socket(AF_INET,SOCK_STREAM,0);
+	if(sockfd ==-1)
+	{
+		std::cout << "create socket error \n";
+		return -1;
+	}
+	struct sockaddr_in remote_addr;
+	const int BUFFSIZE = 200;
+	char buf[BUFFSIZE];
+	int len;
+	memset(&remote_addr,0,sizeof(remote_addr));
+	memset(buf,0,sizeof(buf));
+	remote_addr.sin_family=AF_INET;
+	remote_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
+	remote_addr.sin_port=htons(9807);
+
+	if(connect(sockfd,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr))<0)
+	{
+		std::cout << "sock connect err" << std::endl;
+		return -1;
+	}
+	std::string text;
+	text = "subscriber";
+	send(sockfd,text.c_str(),text.length(),0);
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
 
 		if(error == DDS::RETCODE_OK)
 		{
-			//std::cout << "SampleInfo.sample_rank = " << info.sample_rank << std::endl;
-		 //   std::cout << "SampleInfo.instance_state = " << info.instance_state << std::endl;
 			if(info.valid_data)	
 			{		
-				if(message.c == -1)
+				text = message.sendData;
+				if("exit" == text)
 				{
 				    std::cout << "exit" << std::endl;
 				    break;
 				}
+				std::cout << "to string " << text.c_str() << std::endl;
+				send(sockfd,text.c_str(),text.length(),0);
 				get_count ++;
 				gettimeofday(&tv,NULL);
-				long nowTime = (tv.tv_sec%100) * 1000000 + tv.tv_usec;
-				long diff = nowTime - message.sendTime;
+				long nowTime = tv.tv_sec;
 				std::cout<< "topic name " << topic->get_name() << std::endl;
 				std::cout << "message count " << message.c;
-				std::cout << "message time " << message.sendTime;
-				std::cout << "time " << nowTime;
-				std::cout << ";message diff " << diff;
+				std::cout << ";message time " << message.sendTime;
 				std::cout << ";message data " << message.sendData << std::endl;
 				std::cout << "get_count" << get_count << std::endl;
-				fp << "message_data," << message.sendData << ",message_time," << diff  << std::endl;
+				fp << "message_data," << message.sendData << ",message_time," << message.sendTime  << std::endl;
 
 			}
 		}
 		usleep(delay_us);
 
 	}
+	close(sockfd);
     // Clean-up!
     participant->delete_contained_entities();
     dpf->delete_participant(participant);
