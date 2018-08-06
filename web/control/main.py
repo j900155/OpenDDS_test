@@ -67,13 +67,21 @@ def publish_socket(pub_connect, first_data):
                     print ("pub dds start")
                     pub_dds.start()
                     print type(pub_dds)
+                    pub_connect.send("create")
                 else:
                     print("exist")
+                    pub_connect.send("exist")
             elif jdata["active"] =="status":
                 if type(pub_dds) == type("str"):
                     print "pub dds status {}".format("not create")
+                    pub_connect.send("Flase")
                 else:
-                    print "pub dds status {}".format(pub_dds.isAlive())
+                    print "pub dds status {}".format(str(pub_dds.isAlive()))
+                    if(pub_dds.isAlive()):
+                        pub_connect.send("True")
+                    else:
+                        pub_connect.send("Flase")
+
             elif jdata["active"] == "exit":
                 if str(type(pub_dds)) == "<class 'run_dds.run_pub'>":
                     #pub_dds.send("exit")
@@ -142,15 +150,22 @@ def subscriber_socket(sub_connect, first_data):
                 if type(sub_dds) == type("str"):
                     sub_dds = run_dds.run_sub(sub_cmd=jdata['cmd'],topic=jdata['topic'])
                     print ("sub dds start")
+                    sub_connect.send("create")
                     sub_dds.start()
                 else:
                     print("exist")
+                    sub_connect.send("exist")
             elif jdata["active"] =="status":
                 print ("sub type".format(type(sub_dds)))
                 if str(type(sub_dds)) == "<class 'run_dds.run_sub'>":
                         print "sub dds status {}".format(sub_dds.isAlive())
+                        if(sub_dds.isAlive()):
+                            sub_connect.send("True")
+                        else:
+                            sub_connect.send("Flase")
                 else:
                     print "sub dds status {}".format("not create")
+                    sub_connect.send("Flase")
             elif jdata["active"] == "exit":
                 if str(type(pub_dds)) == "<class 'run_dds.run_sub'>":
                     sub_dds_connect.send("exit")
