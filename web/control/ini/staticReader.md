@@ -1,15 +1,15 @@
 ```ini
 [common]
 DCPSDdebugLevel=0
-DCPSBit=1/0
+#DCPSBit=1/0
 DCPSDefaultDiscovery=discovery
-Scheduler=SCHED_OTHER/SCHED_RR/SCHED_FIFO
+#Scheduler=SCHED_OTHER/SCHED_RR/SCHED_FIFO
 DCPSGlobalTransportConfig=staticConfig
 [rtps_discovery/discovery]
-TTL=1~10
+#TTL=1~10
 [datareaderqos/readerQoS]
-history.kind=KEEP_LAST/KEEP_ALL
-reliability.kind=RELIABLE
+#history.kind=KEEP_LAST/KEEP_ALL
+#reliability.kind=RELIABLE/BEST_EFFORT
 [topic/topicConf]
 type_name=Messenger::Message
 [endpoint/Reader]
@@ -23,6 +23,6 @@ topic=topicConf
 [config/staticConfig]
 transports=transportConf
 [transport/transportConf]
-transport_type=rtps_udp/tcp/udp
+#transport_type=rtps_udp/tcp/udp
 ```
 
