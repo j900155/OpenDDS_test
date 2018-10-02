@@ -1,1 +1,2 @@
 Flask==0.12
+Flask-SocketIO==2.9.6
