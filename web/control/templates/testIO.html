@@ -5,10 +5,23 @@
 		<title>TestIO</title>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 		<script type="text/javascript" charset="utf-8">
-		    var socket = io.connect('http://127.0.0.1:5000');
-			socket.on('connect', function() {
+		    var socket = io.connect('http://127.0.0.1:9806');
+			/*socket.on('connect', function() {
 			    socket.emit('publish', {data: 'connected!'});
 			});
+			setinterval(function(){
+				socket.on('testRec', function(data){
+					colsole.log(data);
+				});
+			},3000);*/
+			socket.emit('testRecvice2', {data: 'connected!'});
+			socket.on('testRecvice2', function(data){
+				console.log(data);
+			});
+			socket.on('testRecvice', function(data){
+				console.log(data);
+			});
+
 		</script>
 	</head>
 	<body>

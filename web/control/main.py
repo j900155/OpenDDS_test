@@ -12,16 +12,19 @@ import threading
 import time
 import json
 import types
+from datetime import datetime
 HOST = "0.0.0.0"
 pub_PORT = 9808
 sub_PORT = 9807
 
 pub_dds_connect = ""
+sub_dds_connect = ""
 
 sub_client_connect = []
 pub_dds = ""
 pubStatus=0
 sub_dds = ""
+subStatus=0
 pub = ""
 sub = ""
 def heart_beat():
@@ -113,26 +116,27 @@ def publish_socket(pub_connect, first_data):
                 elif jdata["active"] =="status":
                     if pubStatus ==1:
                         #alive
-                        pub_dds_connect.send(b"1")
+                        pub_connect.send(b"1")
                     else:
-                        pub_dds_connect.send(b"0")
+                        pub_connect.send(b"0")
 
                 elif jdata["active"] == "exit":
-                    if str(type(pub_dds)) == "<class 'subprocess.Popen'>":
+                    if pubStatus ==1:
                         #pub_dds.send("exit")
                         pub_dds_connect.send(b'exit')
                         pub_dds =""
                         pubStatus = 0
-                    break
+                        break
                 elif jdata["active"] == "kill":
-                    pub_dds.kill()
-                    pub_dds =""
-                    pubStatus = 0
-                    break
-            elif "send" in jdata:
-                if str(type(pub_dds)) == "<class 'subprocess.Popen'>":
-                    print ("pub send data")
-                    print ("pub_dds_connect type {}".format(type(pub_dds_connect)))
+                    if pubStatus==1:
+                        pub_dds.kill()
+                        pub_dds =""
+                        pubStatus = 0
+                        break
+            if "send" in jdata:
+                print ("pub send data")
+                print ("pub_dds_connect type {}".format(type(pub_dds_connect)))
+                if pubStatus ==1:
                     pub_dds_connect.send(str.encode(jdata["send"]))
                     pub_connect.send(str.encode(jdata["send"]))
                 else:
@@ -142,7 +146,7 @@ def publish_socket(pub_connect, first_data):
             print ("timeout")
                 #time.sleep(5)
 
-    #pub_connect.close()
+    pub_connect.close()
     print ("publish_socket end")
 
 def subscriber_dds(sub_connect):
@@ -157,10 +161,10 @@ def subscriber_dds(sub_connect):
 
         for sub_client in sub_client_connect:
             print (sub_client)
-            sub_client.send(data)
-        #TODO data paser
-        #...
-
+            try:
+                sub_client.send(data)
+            except socket.timeout:
+                    print("timeout sub_client")
 
 def subscriber_socket(sub_connect, first_data):
     """
@@ -172,6 +176,8 @@ def subscriber_socket(sub_connect, first_data):
         kill dds subscriber {"active":"exit"}
     """
     global sub_dds
+    global subStatus
+    global sub_dds_connect
     #global sub_client_connect
     #sub_connect.settimeout(0.0)
     #sub_client_connect.append(sub_connect)
@@ -192,36 +198,43 @@ def subscriber_socket(sub_connect, first_data):
             sub_connect.send(b'json paser error')
             jdata = ""
         print (type(jdata))
-
         if "active" in jdata:
             print (jdata["active"])
             if jdata["active"] =="create":
                 print (jdata["cmd"])
                 print (jdata["topic"])
-                if type(sub_dds) == type("str"):
-                    sub_dds = run_dds.run_sub(sub_cmd=jdata['cmd'],topic=jdata['topic'])
+                
+                if subStatus ==0:
                     print ("sub dds start")
-
-                    sub_connect.send("create")
-                    sub_dds.start()
+                    tempSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    tempSocket.connect((HOST,sub_PORT))
+                    #s = "{'send':'"+jdata["topic"] + "'}"
+                    tempSocket.send(b"create")
+                    time.sleep(1)
+                    tempSocket.send(str.encode(jdata["cmd"]))
+                    time.sleep(5)
+                    print(str(sub_dds_connect) + "224")
+                    sub_dds_connect.send(str.encode(jdata["topic"]))
+                    time.sleep(1)
+                    sub_dds_connect.send(str.encode(str(datetime.now().date())))
+                    tempSocket.close()
+                    print (type(sub_dds))
+                    sub_connect.send(b'create')
+                    pubStatus = 1
                 else:
                     print("exist")
                     sub_connect.send("exist")
+                    
             elif jdata["active"] =="status":
-                print ("sub type".format(type(sub_dds)))
-                if str(type(sub_dds)) == "<class 'run_dds.run_sub'>":
-                        print ("sub dds status {}".format(sub_dds.isAlive()))
-                        if(sub_dds.isAlive()):
-                            sub_connect.send("True")
-                        else:
-                            sub_connect.send("Flase")
+                if(subStatus==0):
+                    sub_connect.send(b"0")
                 else:
-                    print ("sub dds status {}".format("not create"))
-                    sub_connect.send("Flase")
+                    sub_connect.send(b"1")
             elif jdata["active"] == "exit":
                 if str(type(pub_dds)) == "<class 'run_dds.run_sub'>":
                     sub_dds_connect.send("exit")
                     sub_dds_connect = ""
+                    subStatus = 0
                 break
         data = sub_connect.recv(4096)
  
@@ -244,11 +257,20 @@ def creat_subscriber_server():
         print ("recv data {}".format(data))
         s = str(data, encoding="utf8")
         if s =="subscriber":
+            print (s)
+            global sub_dds_connect
+            sub_dds_connect = conn
             sub_server = threading.Thread(target=subscriber_dds,args=[conn])
             sub_server.start()
-        elif data =="recv":
-            print (type(conn))
+        elif s =="recv":
+            print (data)
+            conn.settimeout(0.1)
             sub_client_connect.append(conn)
+        elif s =="create":
+            print("sub popen")
+            data = conn.recv(128)
+            s = str(data, encoding="utf8")
+            sub_dds = Popen(s.split(" "))
         else:
             sub_client = threading.Thread(target=subscriber_socket,args=[conn, data])
             sub_client.start()
