@@ -116,14 +116,15 @@ def publish_socket(pub_connect, first_data):
                 elif jdata["active"] =="status":
                     if pubStatus ==1:
                         #alive
-                        pub_connect.send(b"1")
+                        pub_connect.send(b"exist")
                     else:
-                        pub_connect.send(b"0")
+                        pub_connect.send(b"not create")
 
                 elif jdata["active"] == "exit":
                     if pubStatus ==1:
                         #pub_dds.send("exit")
                         pub_dds_connect.send(b'exit')
+                        pub_connect.send(b'exit')
                         pub_dds =""
                         pubStatus = 0
                         break
@@ -132,6 +133,7 @@ def publish_socket(pub_connect, first_data):
                         pub_dds.kill()
                         pub_dds =""
                         pubStatus = 0
+                        pub_connect.send(b'kill')
                         break
             if "send" in jdata:
                 print ("pub send data")
@@ -178,9 +180,9 @@ def subscriber_socket(sub_connect, first_data):
     global sub_dds
     global subStatus
     global sub_dds_connect
-    #global sub_client_connect
+    global sub_client_connect
     #sub_connect.settimeout(0.0)
-    #sub_client_connect.append(sub_connect)
+    sub_client_connect.append(sub_connect)
     data = first_data
     while(1):
         #data = sub_connect.recv(4096)
@@ -212,7 +214,7 @@ def subscriber_socket(sub_connect, first_data):
                     tempSocket.send(b"create")
                     time.sleep(1)
                     tempSocket.send(str.encode(jdata["cmd"]))
-                    time.sleep(5)
+                    time.sleep(1)
                     print(str(sub_dds_connect) + "224")
                     sub_dds_connect.send(str.encode(jdata["topic"]))
                     time.sleep(1)

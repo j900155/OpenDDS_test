@@ -35,7 +35,8 @@ def handle_test(data):
     r = send_socket.recv(1024)
     r = str(r,encoding="utf8")
     print ("r ",r)
-    emit('publishReturn', {'data': r})
+    if len(r)>0:
+        emit('publishReturn', {'data': r})
     send_socket.close()
 @socketio.on('subscriberSend')
 def handle_test(data):
@@ -45,6 +46,7 @@ def handle_test(data):
     s = json.dumps(data)
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     send_socket.connect((bindIP,subPort))
+    s = str.encode(s)
     send_socket.send(s)
     r = send_socket.recv(1024)
     r = str(r,encoding="utf8")
@@ -60,9 +62,9 @@ def subscriberRecv(data):
     while(1):
         r = send_socket.recv(512)
         r = str(r,encoding="utf8")
-        if r =="exit":
-            break
         emit('subscriberRecv', {'data': r})
+        if r =="exit" or r =="kill":
+            break
     send_socket.close()
 
 @socketio.on('testRecvice2')
@@ -79,4 +81,4 @@ def test():
     return render_template('testIO.html')
 
 if __name__ == '__main__':
-    socketio.run(app,host = "127.0.0.1",port=9806)
+    socketio.run(app,host = "0.0.0.0",port=9806)
