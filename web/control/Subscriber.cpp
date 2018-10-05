@@ -73,8 +73,8 @@ int ACE_TMAIN(int argc, char *argv[])
 	std::string topic_name;
 	len = recv(sockfd,buf,BUFFSIZE,0);
 	buf[len] = '\0';
-	std::cout << "topic name " << topic_name << std::endl;
 	topic_name = buf;
+	std::cout << "topic name " << topic_name << std::endl;
 
 	DDS::TopicQos topic_Qos;
 	participant->get_default_topic_qos(topic_Qos);

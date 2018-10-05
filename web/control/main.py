@@ -180,9 +180,9 @@ def subscriber_socket(sub_connect, first_data):
     global sub_dds
     global subStatus
     global sub_dds_connect
-    global sub_client_connect
+    #global sub_client_connect
     #sub_connect.settimeout(0.0)
-    sub_client_connect.append(sub_connect)
+    #sub_client_connect.append(sub_connect)
     data = first_data
     while(1):
         #data = sub_connect.recv(4096)
@@ -216,6 +216,7 @@ def subscriber_socket(sub_connect, first_data):
                     tempSocket.send(str.encode(jdata["cmd"]))
                     time.sleep(1)
                     print(str(sub_dds_connect) + "224")
+                    print (jdata["topic"])
                     sub_dds_connect.send(str.encode(jdata["topic"]))
                     time.sleep(1)
                     sub_dds_connect.send(str.encode(str(datetime.now().date())))
@@ -265,7 +266,7 @@ def creat_subscriber_server():
             sub_server = threading.Thread(target=subscriber_dds,args=[conn])
             sub_server.start()
         elif s =="recv":
-            print ("recv" + data)
+            print ("recv" + s)
             conn.settimeout(0.1)
             sub_client_connect.append(conn)
         elif s =="create":
