@@ -53,16 +53,16 @@ def handle_test(data):
     emit('subscriberReturn', {'data': r})
     send_socket.close()
 
-@socketio.on('subscriberRecviStart')
+@socketio.on('subscriberRecevieStart')
 def subscriberRecv(data):
-    print ("subscriberRecvStart")
+    print ("subscriberRecevieStart")
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     send_socket.connect((bindIP,subPort))
     send_socket.send(b"recv")
     while(1):
         r = send_socket.recv(512)
         r = str(r,encoding="utf8")
-        emit('subscriberRecv', {'data': r})
+        emit('subscriberRecevie', {'data': r})
         if r =="exit" or r =="kill":
             break
     send_socket.close()

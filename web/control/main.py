@@ -265,7 +265,7 @@ def creat_subscriber_server():
             sub_server = threading.Thread(target=subscriber_dds,args=[conn])
             sub_server.start()
         elif s =="recv":
-            print (data)
+            print ("recv" + data)
             conn.settimeout(0.1)
             sub_client_connect.append(conn)
         elif s =="create":
