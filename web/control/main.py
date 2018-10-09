@@ -93,7 +93,7 @@ def publish_socket(pub_connect, first_data):
                         pubStatus = 0
                     else:
                         if pub_dds.poll() ==None:
-                            status = 1
+                            pubstatus = 1
                         else:
                             print ("poll not None")
                             pubStatus = 0
@@ -164,7 +164,7 @@ def subscriber_dds(sub_connect):
             print (len(data))
             print ("subscriber_dds break")
             break
-        if subSocketIOStatus ==1
+        if subSocketIOStatus ==1:
             with SocketIO('localhost', 9806, LoggingNamespace) as socketIO:
                     socketIO.emit('sub',str(data,encoding="utf8"))
         for sub_client in sub_client_connect:
@@ -195,7 +195,7 @@ def subscriber_socket(sub_connect, first_data):
         print("sub recv data {}".format(data))
         if len(data) < 1:
             print (data)
-            sub_client_connect.remove(sub_connect)
+            #sub_client_connect.remove(sub_connect)
             break
         try:
             s = str(data,encoding="utf8")
@@ -229,13 +229,13 @@ def subscriber_socket(sub_connect, first_data):
                     tempSocket.close()
                     print (type(sub_dds))
                     sub_connect.send(b'create')
-                    pubStatus = 1
+                    subStatus = 1
                 else:
                     print("exist")
                     sub_connect.send("exist")
                     
             elif jdata["active"] =="status":
-                if(subStatus==0):
+                if subStatus==0:
                     sub_connect.send(b"not create")
                 else:
                     sub_connect.send(b"exist")
@@ -247,6 +247,7 @@ def subscriber_socket(sub_connect, first_data):
                         sub_client.close()
                     subSocketIOStatus=0
                     subStatus = 0
+                    sub_connect.send(b'exit')
                     break
                 else:
                     sub_connect.send(b"not create")
