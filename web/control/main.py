@@ -165,6 +165,7 @@ def subscriber_dds(sub_connect):
             print ("subscriber_dds break")
             break
         if subSocketIOStatus ==1:
+            print("168")
             with SocketIO('localhost', 9806, LoggingNamespace) as socketIO:
                     socketIO.emit('sub',str(data,encoding="utf8"))
         for sub_client in sub_client_connect:

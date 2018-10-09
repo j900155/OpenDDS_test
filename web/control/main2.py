@@ -23,7 +23,7 @@ pubPort = 9808
 subPort = 9807
 @socketio.on('publishSend')
 def handle_test(data):
-    print ("io test")
+    print ("publsihSend")
     print("get json {}".format(data))
     #jdata = json.loads(data)
     s = json.dumps(data)
@@ -40,7 +40,7 @@ def handle_test(data):
     send_socket.close()
 @socketio.on('subscriberSend')
 def handle_test(data):
-    print ("io test")
+    print ("subscriberSend")
     print("get json {}".format(data))
     #jdata = json.loads(data)
     s = json.dumps(data)
@@ -78,6 +78,7 @@ def subscriberRecv(data):
 @socketio.on("sub")
 def socketSubSend(data):
     print("in sub {}".format(data))
+    #emit("subscriberRecevie","12312")
     emit('subscriberRecevie', {'data': data})
 
 @socketio.on('testRecvice2')
