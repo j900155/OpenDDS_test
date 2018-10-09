@@ -13,6 +13,8 @@ import time
 import json
 import types
 from datetime import datetime
+from socketIO_client import SocketIO, LoggingNamespace
+
 HOST = "0.0.0.0"
 pub_PORT = 9808
 sub_PORT = 9807
@@ -27,6 +29,7 @@ sub_dds = ""
 subStatus=0
 pub = ""
 sub = ""
+subSocketIOStatus=0
 def heart_beat():
     pass
 def publish_dds(pub_connect):
@@ -153,6 +156,7 @@ def publish_socket(pub_connect, first_data):
 
 def subscriber_dds(sub_connect):
     global sub_client_connect
+    global subSocketIOStatus
     while(1):
         data = sub_connect.recv(4096)
         print ("subscriber dds {}".format(data))
@@ -160,7 +164,9 @@ def subscriber_dds(sub_connect):
             print (len(data))
             print ("subscriber_dds break")
             break
-
+        if subSocketIOStatus ==1
+            with SocketIO('localhost', 9806, LoggingNamespace) as socketIO:
+                    socketIO.emit('sub',str(data,encoding="utf8"))
         for sub_client in sub_client_connect:
             print (sub_client)
             try:
@@ -230,19 +236,27 @@ def subscriber_socket(sub_connect, first_data):
                     
             elif jdata["active"] =="status":
                 if(subStatus==0):
-                    sub_connect.send(b"0")
+                    sub_connect.send(b"not create")
                 else:
-                    sub_connect.send(b"1")
+                    sub_connect.send(b"exist")
             elif jdata["active"] == "exit":
-                if str(type(pub_dds)) == "<class 'run_dds.run_sub'>":
-                    sub_dds_connect.send("exit")
+                if subStatus==1:
+                    sub_dds_connect.send(b"exit")
                     sub_dds_connect = ""
+                    for sub_client in sub_client_connect:
+                        sub_client.close()
+                    subSocketIOStatus=0
                     subStatus = 0
-                break
+                    break
+                else:
+                    sub_connect.send(b"not create")
+
         data = sub_connect.recv(4096)
  
 def creat_subscriber_server():
     global sub_client_connect
+    global sub_dds
+    global subSocketIOStatus
     try:
         #server = socket.MSG_DONTROUTEcket(socket.AF_INET, socket.SOCK_STREAM)
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -274,6 +288,8 @@ def creat_subscriber_server():
             data = conn.recv(128)
             s = str(data, encoding="utf8")
             sub_dds = Popen(s.split(" "))
+        elif s=="socketio":
+            subSocketIOStatus=1
         else:
             sub_client = threading.Thread(target=subscriber_socket,args=[conn, data])
             sub_client.start()

@@ -34,7 +34,7 @@ def handle_test(data):
     send_socket.send(s)
     r = send_socket.recv(1024)
     r = str(r,encoding="utf8")
-    print ("r ",r)
+    print ("pub r ",r)
     if len(r)>0:
         emit('publishReturn', {'data': r})
     send_socket.close()
@@ -46,6 +46,7 @@ def handle_test(data):
     s = json.dumps(data)
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     send_socket.connect((bindIP,subPort))
+    print("50 " +s)
     s = str.encode(s)
     send_socket.send(s)
     r = send_socket.recv(1024)
@@ -58,14 +59,26 @@ def subscriberRecv(data):
     print ("subscriberRecevieStart")
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     send_socket.connect((bindIP,subPort))
-    send_socket.send(b"recv")
-    while(1):
-        r = send_socket.recv(512)
-        r = str(r,encoding="utf8")
-        emit('subscriberRecevie', {'data': r})
-        if r =="exit" or r =="kill":
-            break
+    send_socket.send(b"socketio")
+    emit('subscriberRecevie', {'data': "start subscriber recevie"})
+    send_socket.settimeout(3)
+    r = ""
+    #while(1):
+    print ("67")
+    #try:
+    #    r = send_socket.recv(512)
+    #    r = str(r,encoding="utf8")
+    #    emit('subscriberRecevie', {'data': r})
+    #except socket.timeout: 
+    #    r = ""
+    #if r =="exit" or r =="kill":
+    #    #break
+    #    pass
     send_socket.close()
+@socketio.on("sub")
+def socketSubSend(data):
+    print("in sub {}".format(data))
+    emit('subscriberRecevie', {'data': data})
 
 @socketio.on('testRecvice2')
 def sendWhile(data) :
