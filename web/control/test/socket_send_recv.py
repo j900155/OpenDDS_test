@@ -10,9 +10,8 @@
 
 """
 import socket
-send_port = 9808
 bind_ip = "0.0.0.0"
-def main():
+def main(send_port):
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     send_socket.connect((bind_ip,send_port))
@@ -21,9 +20,11 @@ def main():
         if d=="-1":
             send_socket.close()
             break
-        send_socket.send(d)
-        print send_socket.recv(4096)
+        else:
+            send_socket.send(d)
+            print (send_socket.recv(1024))
 
 if __name__ =="__main__":
-    main()
+    send_port = int(raw_input("port "))
+    main(send_port)
 

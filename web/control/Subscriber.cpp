@@ -18,8 +18,40 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+int startSocket(int *sockfd, struct sockaddr_in *remote_addr)
+{
+	*sockfd = socket(AF_INET,SOCK_STREAM,0);
+	if(*sockfd ==-1)
+	{
+		std::cout << "create socket error \n";
+		return -1;
+	}
+	memset(remote_addr,0,sizeof(*remote_addr));
+	remote_addr->sin_family=AF_INET;
+	remote_addr->sin_addr.s_addr=inet_addr("127.0.0.1");
+	remote_addr->sin_port=htons(9807);
+
+	if(connect(*sockfd,(struct sockaddr *)remote_addr,sizeof(struct sockaddr))<0)
+	{
+		std::cout << "sock connect err" << std::endl;
+		return -1;
+	}
+	send(*sockfd,"subscriber",10,0);
+
+	return 0;
+}
 int ACE_TMAIN(int argc, char *argv[])
 {
+	int sockfd = 0;
+	struct sockaddr_in remote_addr;
+	const int BUFFSIZE = 200;
+	char buf[BUFFSIZE];
+	int len;
+	fstream fp;
+	memset(buf,0,sizeof(buf));
+	startSocket(&sockfd,&remote_addr);
+	std::string text;
+
 	DDS::DomainParticipantFactory_var dpf = TheParticipantFactoryWithArgs(argc, argv);
 	DDS::DomainParticipant_var participant = dpf-> 
 		create_participant(
@@ -39,8 +71,9 @@ int ACE_TMAIN(int argc, char *argv[])
 	//topic
 	
 	std::string topic_name;
-	std::cout << "topic name?" << std::endl;
-	std::cin >> topic_name;
+	len = recv(sockfd,buf,BUFFSIZE,0);
+	buf[len] = '\0';
+	topic_name = buf;
 	std::cout << "topic name " << topic_name << std::endl;
 
 	DDS::TopicQos topic_Qos;
@@ -97,41 +130,14 @@ int ACE_TMAIN(int argc, char *argv[])
 	struct timeval tv;
 	int get_count = 0;
 	int delay_us = 1000;
-	std::cout << "delay us" << std::endl;
-	std::cin >> delay_us;
-	fstream fp;
 	std::string fileName;
-	std::cout << "file name" << std::endl;
-	std::cin >> fileName;
+	len = recv(sockfd,buf,BUFFSIZE,0);
+	buf[len]='\0';
+	fileName = buf;
 	fileName +=".txt";
 	fp.open(fileName, std::fstream::out | std::fstream::app);
 	//socket create
-	std::cout << "socket start" << std::endl;
-	int sockfd = 0;
-	sockfd = socket(AF_INET,SOCK_STREAM,0);
-	if(sockfd ==-1)
-	{
-		std::cout << "create socket error \n";
-		return -1;
-	}
-	struct sockaddr_in remote_addr;
-	const int BUFFSIZE = 200;
-	char buf[BUFFSIZE];
-	int len;
-	memset(&remote_addr,0,sizeof(remote_addr));
-	memset(buf,0,sizeof(buf));
-	remote_addr.sin_family=AF_INET;
-	remote_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
-	remote_addr.sin_port=htons(9807);
-
-	if(connect(sockfd,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr))<0)
-	{
-		std::cout << "sock connect err" << std::endl;
-		return -1;
-	}
-	std::string text;
-	text = "subscriber";
-	send(sockfd,text.c_str(),text.length(),0);
+	std::cout << "while start" << std::endl;
 	while(true)
 	{
 		error = dataReader->take_next_sample(message, info);
