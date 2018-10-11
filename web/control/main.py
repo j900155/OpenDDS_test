@@ -233,14 +233,14 @@ def subscriber_socket(sub_connect, first_data):
                     subStatus = 1
                 else:
                     print("exist")
-                    sub_connect.send("exist")
+                    sub_connect.send(b"exist")
                     
             elif jdata["active"] =="status":
                 if subStatus==0:
                     sub_connect.send(b"not create")
                 else:
                     sub_connect.send(b"exist")
-            elif jdata["active"] == "exit":
+            elif jdata["active"] == "kill":
                 if subStatus==1:
                     sub_dds_connect.send(b"exit")
                     sub_dds_connect = ""
@@ -248,7 +248,7 @@ def subscriber_socket(sub_connect, first_data):
                         sub_client.close()
                     subSocketIOStatus=0
                     subStatus = 0
-                    sub_connect.send(b'exit')
+                    sub_connect.send(b'kill')
                     break
                 else:
                     sub_connect.send(b"not create")

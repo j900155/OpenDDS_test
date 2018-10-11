@@ -10,7 +10,7 @@
 
 """
 from flask import Flask, render_template
-from flask_socketio import SocketIO,emit
+from flask_socketio import SocketIO,emit,send,join_room
 import json
 import socket
 import time
@@ -61,6 +61,7 @@ def subscriberRecv(data):
     send_socket.connect((bindIP,subPort))
     send_socket.send(b"socketio")
     emit('subscriberRecevie', {'data': "start subscriber recevie"})
+    join_room("subRoom")
     send_socket.settimeout(3)
     r = ""
     #while(1):
@@ -79,7 +80,9 @@ def subscriberRecv(data):
 def socketSubSend(data):
     print("in sub {}".format(data))
     #emit("subscriberRecevie","12312")
-    emit('subscriberRecevie', {'data': data})
+    emit('subscriberRecevie', {'data': data},broadcast=True)
+    #send({'data':data},room="subRoom")
+    print("in sub2 {}".format(data))
 
 @socketio.on('testRecvice2')
 def sendWhile(data) :
