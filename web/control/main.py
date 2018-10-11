@@ -246,6 +246,7 @@ def subscriber_socket(sub_connect, first_data):
                     sub_dds_connect = ""
                     for sub_client in sub_client_connect:
                         sub_client.close()
+                    sub_dds.kill()
                     subSocketIOStatus=0
                     subStatus = 0
                     sub_connect.send(b'kill')
