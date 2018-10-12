@@ -130,7 +130,9 @@ def publish_socket(pub_connect, first_data):
                         pub_connect.send(b'exit')
                         pub_dds =""
                         pubStatus = 0
-                        break
+                        #break
+                    else:
+                        pub_connect.send(b"not create")
                 elif jdata["active"] == "kill":
                     if pubStatus==1:
                         pub_dds.kill()
@@ -138,6 +140,8 @@ def publish_socket(pub_connect, first_data):
                         pubStatus = 0
                         pub_connect.send(b'kill')
                         break
+                    else:
+                        pub_connect.send(b"not create")
             if "send" in jdata:
                 print ("pub send data")
                 print ("pub_dds_connect type {}".format(type(pub_dds_connect)))
@@ -187,6 +191,7 @@ def subscriber_socket(sub_connect, first_data):
     global sub_dds
     global subStatus
     global sub_dds_connect
+    global subSocketIOStatus
     #global sub_client_connect
     #sub_connect.settimeout(0.0)
     #sub_client_connect.append(sub_connect)
