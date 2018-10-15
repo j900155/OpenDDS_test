@@ -15,7 +15,7 @@ def main():
     timeNow = "2018-10-11"
     secNow = 1539235432
     fileName ="/test/2018-10-11.txt"
-    return get(timeNow,secNow,fileName)
+    return get(timeNow,secNow,fileName,choose="")
 def get(timeNow=None,secNow=None,fileName=None,choose="pub"):
     if timeNow==None or secNow==None:
         timeNow = time.strftime("%Y-%m-%d")
