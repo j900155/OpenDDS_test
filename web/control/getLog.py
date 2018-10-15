@@ -37,7 +37,7 @@ def get(timeNow=None,secNow=None,fileName=None):
                     dataLen = len(str(sRawFile[2:-2]))
                     #print(sRawFile[-1])
                     if int(sRawFile[-1])>(secNow+(count+1)*60) and count < 5:
-                        s = int(time.time()*100)+count*60
+                        s = int(time.time()*1000)+count*60*1000
                         showLog.append([s,dataLen])
                         #print (s)
                         count +=1
