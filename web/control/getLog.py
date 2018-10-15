@@ -16,13 +16,13 @@ def main():
     secNow = 1539235432
     fileName ="/test/2018-10-11.txt"
     return get(timeNow,secNow,fileName)
-def get(timeNow=None,secNow=None,fileName=None):
+def get(timeNow=None,secNow=None,fileName=None,choose="pub"):
     if timeNow==None or secNow==None:
         timeNow = time.strftime("%Y-%m-%d")
         secNow = int(time.time())
-    #print(secNow)
-    #print(timeNow)
-    fileName = str(timeNow)+".txt"
+        #print(secNow)
+        #print(timeNow)
+        fileName = choose+str(timeNow)+".txt"
     showLog = []
     count = 0
     #print(fileName)

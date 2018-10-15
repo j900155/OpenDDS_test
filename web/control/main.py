@@ -268,10 +268,12 @@ def creat_subscriber_server():
     try:
         #server = socket.MSG_DONTROUTEcket(socket.AF_INET, socket.SOCK_STREAM)
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     except socket.err:
         msg = socket.err
-        sys.stderr.write("ERROR sub {} ".format(msg))
-        sys.exit(1)
+        print (msg)
+        #sys.stderr.write("ERROR sub {} ".format(msg))
+        #sys.exit(1)
     server.bind((HOST, sub_PORT))
     server.listen(10)
     print ("start subscriber server port {}".format(sub_PORT))
@@ -306,10 +308,12 @@ def create_publish_server():
     global pub_dds
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     except socket.err:
         msg = socket.err
-        sys.stderr.write("ERROR pub {} ".format(msg))
-        sys.exit(1)
+        print(msg)
+        #sys.stderr.write("ERROR pub {} ".format(msg))
+        #sys.exit(1)
     server.bind((HOST, pub_PORT))
     server.listen(10)
     print ("start publish server port {}".format(pub_PORT))

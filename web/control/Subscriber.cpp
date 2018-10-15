@@ -134,6 +134,7 @@ int ACE_TMAIN(int argc, char *argv[])
 	len = recv(sockfd,buf,BUFFSIZE,0);
 	buf[len]='\0';
 	fileName = buf;
+	fileName = "sub"+fileName;
 	fileName +=".txt";
 	fp.open(fileName, std::fstream::out | std::fstream::app);
 	//socket create
