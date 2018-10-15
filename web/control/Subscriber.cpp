@@ -17,7 +17,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/time.h>
-
+#define UTC (+8)
 int startSocket(int *sockfd, struct sockaddr_in *remote_addr)
 {
 	*sockfd = socket(AF_INET,SOCK_STREAM,0);
