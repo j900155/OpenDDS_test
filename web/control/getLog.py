@@ -11,12 +11,14 @@ import os.path
 """
 return list
 """
-FilePath = "~/OpenDDS_test/web/control/log"
+FilePath = "/home/zack/github/OpenDDS_test/web/control/log/"
 def main():
-    timeNow = "2018-10-11"
+    #timeNow = "2018-10-11"
+    timeNow = time.strftime("%Y-%m-%d")
     secNow = 1539235432
     fileName ="/test/2018-10-11.txt"
-    return get(timeNow,secNow,fileName,choose="")
+    #return get(timeNow,secNow,fileName,choose="")
+    return get(choose="pub")
 def get(timeNow=None,secNow=None,fileName=None,choose="pub"):
     global FilePath
     if timeNow==None or secNow==None:
@@ -25,6 +27,7 @@ def get(timeNow=None,secNow=None,fileName=None,choose="pub"):
         #print(secNow)
         #print(timeNow)
         fileName = FilePath+choose+str(timeNow)+".txt"
+        print (fileName)
     showLog = []
     count = 0
     #print(fileName)
