@@ -136,6 +136,7 @@ int ACE_TMAIN(int argc, char *argv[])
 	fileName = buf;
 	fileName = "sub"+fileName;
 	fileName +=".txt";
+	fileName = "./log/" + fileName;
 	fp.open(fileName, std::fstream::out | std::fstream::app);
 	//socket create
 	std::cout << "while start" << std::endl;

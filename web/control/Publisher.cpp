@@ -177,6 +177,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	len = sprintf(buf,"pub%d-%d-%d.txt",year,month,day);
 	buf[len]='\0';
 	fileName = buf;
+	fileName ="./log/" + fileName;
+	fp << "fileName " << fileName << std::endl;
 	//fileName = "sub"+year+"-"+month+"-"+day+".txt".
 	fpLog.open(fileName, std::fstream::out | std::fstream::app);
 
