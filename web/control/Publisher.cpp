@@ -219,7 +219,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 			gettimeofday(&tv,NULL);
 			//int sec = tv.tv_sec%100;
 			//message.sendTime = (tv.tv_usec + sec*1000000);
-			message.sendTime = tv.tv_sec;
+			message.sendTime = tv.tv_sec + 28800;
 			message.c = c;
 			error = message_writer->write(message, DDS::HANDLE_NIL);
 			fpLog << "message_data," << message.sendData << ",message_time," << message.sendTime  << std::endl;
