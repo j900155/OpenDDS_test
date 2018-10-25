@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/img/opendds.png">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/static/css/sendTest.css" rel="stylesheet">
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+    <script src="/static/js/socket.io.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script>
+        const eth0IP = '{{ eth0IP }}';
+        window.onload = function () {
+            $('#reboot').on('click', function () {
+                if (window.confirm('確定要關機嗎？')) {
+                    $.ajax({
+                        type: "POST",
+                        url: "reboot",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify({ status: 'reboot' }),
+                        success: function (data) {
+                            console.log('success');
+                            window.location.reload(true);
+                        },
+                        error: function (data) {
+                            console.log('error');
+                            window.location.reload(true);
+                        }
+                    });
+                }
+            });
+            let listA = document.getElementById("listA");
+            listA.scrollTop = listA.scrollHeight;
+            let listB = document.getElementById("listB");
+            listB.scrollTop = listB.scrollHeight;
+        }
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">DDS</a>
+            <button class="power-btn" id="reboot"><img src="/static/img/power.png" class="power-img"></button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active">
+                        <a href="/">系統設定
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="ipSettingMain">IP 設定(內建網卡）</a>
+                    </li>
+                    <li>
+                        <a href="ipSettingSecond">IP 設定(外接網卡）</a>
+                    </li>
+                    <li>
+                        <a href="iniCreate">ini 建立</a>
+                    </li>
+                    <li>
+                        <a href="iniUpdate">ini 列表及上傳</a>
+                    </li>
+                    <li>
+                        <a href="ping">網路診斷</a>
+                    </li>
+                    <li>
+                        <a href="logs">流量統計紀錄分析</a>
+                    </li>
+                    <li>
+                        <a href="sendTest">傳輸測試</a>
+                    </li>
+                    <li>
+                        <a href="rpiSetting">設定</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2 col-sm-9 col-sm-offset-3 col-xs-8 col-xs-offset-4 main">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 send-setting">
+                        <h1 class="page-header">傳輸測試</h1>
+                        <div>
+                            <h3>publish設定：</h3><br><br>
+                            <h4 class="inline set-text-sty">
+                                (1) ini選擇：</h4>
+                            <select id="publishIni">
+                                {% for value in fileList %}
+                                <option value={{value}}>{{value}}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 send-setting">
+                        <div>
+                            <h4 class="inline set-text-sty">(2) 訂閱通道設定：</h4>
+                            <input class="inline set-topic-text" type="text" id="publishTopic">
+                            <input class="inline" type="button" value="create" id="publishCreate">
+                            <input class="inline" type="button" value="status" id="publishStatus">
+                            <input class="inline" type="button" value="exit" id="publishExit">
+                            <input class="inline" type="button" value="kill" id="publishKill">
+                        </div><br>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 send-setting">
+                        <div>
+                            <h3>subscriber設定：</h3><br><br>
+                            <h4 class="inline set-text-sty">(1) ini選擇：</h4>
+                            <select id="subscriberIni">
+                                {% for value in fileList %}
+                                <option value={{value}}>{{value}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 send-setting">
+                        <div>
+                            <h4 class="inline set-text-sty">(2) 訂閱通道設定：</h4>
+                            <input class="inline set-topic-text" type="text" id="subscriberTopic">
+                            <input class="inline" type="button" value="create" id="subscriberCreate">
+                            <input class="inline" type="button" value="start" id="subscriberStart">
+                            <input class="inline" type="button" value="status" id="subscriberStatus">
+                            <input class="inline" type="button" value="kill" id="subscriberKill">
+                        </div>
+                    </div>
+                </div>
+                <div class="row message-sty">
+                    <!-- <div class="col-lg-12 col-md-12 col-sm-10 col-sm-offset-1 col-xs-10 col-xs-offset-1 message"> -->
+                    <div class="message-title">
+                        <p>DDS通訊</p>
+                    </div>
+                    <div class="message-list">
+                        <ul class="message-list-sty" id="listA"></ul>
+                    </div>
+                    <div class="send ">
+                        <div class="send-input-text ">
+                            <input class="send-input-text-sty " type="text" id="msgA">
+                        </div>
+                        <div class="send-input-btn ">
+                            <input class="send-input-btn-sty " type="button" value="送出" id="sendA">
+                        </div>
+                    </div>
+                    <!-- </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScrip ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery.min.js "></script>
+    <script>
+        window.jQuery || document.write('<script src="/static/js/jquery.min.js "><\/script>')
+    </script>
+    <script src="/static/js/bootstrap.min.js "></script>
+    <script src="/static/js/holder.min.js "></script>
+    <script src="/static/js/ie10-viewport-bug-workaround.js "></script>
+    <script src="/static/js/socket-io.js"></script>
+</body>
+
+</html>
