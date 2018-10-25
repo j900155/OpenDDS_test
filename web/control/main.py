@@ -130,7 +130,9 @@ def publish_socket(pub_connect, first_data):
                         pub_connect.send(b'exit')
                         pub_dds =""
                         pubStatus = 0
-                        break
+                        #break
+                    else:
+                        pub_connect.send(b"not create")
                 elif jdata["active"] == "kill":
                     if pubStatus==1:
                         pub_dds.kill()
@@ -138,6 +140,8 @@ def publish_socket(pub_connect, first_data):
                         pubStatus = 0
                         pub_connect.send(b'kill')
                         break
+                    else:
+                        pub_connect.send(b"not create")
             if "send" in jdata:
                 print ("pub send data")
                 print ("pub_dds_connect type {}".format(type(pub_dds_connect)))
@@ -165,6 +169,7 @@ def subscriber_dds(sub_connect):
             print ("subscriber_dds break")
             break
         if subSocketIOStatus ==1:
+            print("168")
             with SocketIO('localhost', 9806, LoggingNamespace) as socketIO:
                     socketIO.emit('sub',str(data,encoding="utf8"))
         for sub_client in sub_client_connect:
@@ -186,6 +191,7 @@ def subscriber_socket(sub_connect, first_data):
     global sub_dds
     global subStatus
     global sub_dds_connect
+    global subSocketIOStatus
     #global sub_client_connect
     #sub_connect.settimeout(0.0)
     #sub_client_connect.append(sub_connect)
@@ -232,22 +238,23 @@ def subscriber_socket(sub_connect, first_data):
                     subStatus = 1
                 else:
                     print("exist")
-                    sub_connect.send("exist")
+                    sub_connect.send(b"exist")
                     
             elif jdata["active"] =="status":
                 if subStatus==0:
                     sub_connect.send(b"not create")
                 else:
                     sub_connect.send(b"exist")
-            elif jdata["active"] == "exit":
+            elif jdata["active"] == "kill":
                 if subStatus==1:
                     sub_dds_connect.send(b"exit")
                     sub_dds_connect = ""
                     for sub_client in sub_client_connect:
                         sub_client.close()
+                    sub_dds.kill()
                     subSocketIOStatus=0
                     subStatus = 0
-                    sub_connect.send(b'exit')
+                    sub_connect.send(b'kill')
                     break
                 else:
                     sub_connect.send(b"not create")
@@ -261,10 +268,12 @@ def creat_subscriber_server():
     try:
         #server = socket.MSG_DONTROUTEcket(socket.AF_INET, socket.SOCK_STREAM)
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     except socket.err:
         msg = socket.err
-        sys.stderr.write("ERROR sub {} ".format(msg))
-        sys.exit(1)
+        print (msg)
+        #sys.stderr.write("ERROR sub {} ".format(msg))
+        #sys.exit(1)
     server.bind((HOST, sub_PORT))
     server.listen(10)
     print ("start subscriber server port {}".format(sub_PORT))
@@ -299,10 +308,12 @@ def create_publish_server():
     global pub_dds
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     except socket.err:
         msg = socket.err
-        sys.stderr.write("ERROR pub {} ".format(msg))
-        sys.exit(1)
+        print(msg)
+        #sys.stderr.write("ERROR pub {} ".format(msg))
+        #sys.exit(1)
     server.bind((HOST, pub_PORT))
     server.listen(10)
     print ("start publish server port {}".format(pub_PORT))

@@ -27,7 +27,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-
+#include <ctime>
+#define UTC (+8)
 int startSocket(int *sockfd, struct sockaddr_in *remote_addr)
 {
 	*sockfd = socket(AF_INET,SOCK_STREAM,0);
@@ -166,6 +167,21 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	//time
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
+	fstream fpLog;
+	time_t t=time(NULL);
+	tm* timePtr = localtime(&t);
+	std::string fileName = "";
+	int year = timePtr->tm_year+1900;
+	int month = timePtr->tm_mon+1;
+	int day = timePtr->tm_mday;
+	len = sprintf(buf,"pub%d-%d-%d.txt",year,month,day);
+	buf[len]='\0';
+	fileName = buf;
+	fileName ="./log/" + fileName;
+	fp << "fileName " << fileName << std::endl;
+	//fileName = "sub"+year+"-"+month+"-"+day+".txt".
+	fpLog.open(fileName, std::fstream::out | std::fstream::app);
+
     // Write samples
 	long c = 0;
 	int i;
@@ -205,9 +221,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 			gettimeofday(&tv,NULL);
 			//int sec = tv.tv_sec%100;
 			//message.sendTime = (tv.tv_usec + sec*1000000);
-			message.sendTime = tv.tv_sec;
+			message.sendTime = tv.tv_sec + 28800;
 			message.c = c;
 			error = message_writer->write(message, DDS::HANDLE_NIL);
+			fpLog << "message_data," << message.sendData << ",message_time," << message.sendTime  << std::endl;
 			if (error != DDS::RETCODE_OK)
 			{
 				fp<< "error" << std::endl;

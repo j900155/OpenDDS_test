@@ -10,7 +10,7 @@
 
 """
 from flask import Flask, render_template
-from flask_socketio import SocketIO,emit
+from flask_socketio import SocketIO,emit,send,join_room
 import json
 import socket
 import time
@@ -23,7 +23,7 @@ pubPort = 9808
 subPort = 9807
 @socketio.on('publishSend')
 def handle_test(data):
-    print ("io test")
+    print ("publsihSend")
     print("get json {}".format(data))
     #jdata = json.loads(data)
     s = json.dumps(data)
@@ -40,7 +40,7 @@ def handle_test(data):
     send_socket.close()
 @socketio.on('subscriberSend')
 def handle_test(data):
-    print ("io test")
+    print ("subscriberSend")
     print("get json {}".format(data))
     #jdata = json.loads(data)
     s = json.dumps(data)
@@ -61,6 +61,7 @@ def subscriberRecv(data):
     send_socket.connect((bindIP,subPort))
     send_socket.send(b"socketio")
     emit('subscriberRecevie', {'data': "start subscriber recevie"})
+    join_room("subRoom")
     send_socket.settimeout(3)
     r = ""
     #while(1):
@@ -78,7 +79,10 @@ def subscriberRecv(data):
 @socketio.on("sub")
 def socketSubSend(data):
     print("in sub {}".format(data))
-    emit('subscriberRecevie', {'data': data})
+    #emit("subscriberRecevie","12312")
+    emit('subscriberRecevie', {'data': data},broadcast=True)
+    #send({'data':data},room="subRoom")
+    print("in sub2 {}".format(data))
 
 @socketio.on('testRecvice2')
 def sendWhile(data) :

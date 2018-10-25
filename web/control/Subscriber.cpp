@@ -17,7 +17,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/time.h>
-
+#define UTC (+8)
 int startSocket(int *sockfd, struct sockaddr_in *remote_addr)
 {
 	*sockfd = socket(AF_INET,SOCK_STREAM,0);
@@ -134,7 +134,9 @@ int ACE_TMAIN(int argc, char *argv[])
 	len = recv(sockfd,buf,BUFFSIZE,0);
 	buf[len]='\0';
 	fileName = buf;
+	fileName = "sub"+fileName;
 	fileName +=".txt";
+	fileName = "./log/" + fileName;
 	fp.open(fileName, std::fstream::out | std::fstream::app);
 	//socket create
 	std::cout << "while start" << std::endl;
