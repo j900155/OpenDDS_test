@@ -98,7 +98,7 @@ $(function () {
         let pubSettingSave = { "type": "pub", "topic": topic, "rtps": ini }
         socket.emit('publishSend', {
             "active": "create",
-            "cmd": "./publisher -DCPSConfigFile " + ini,
+            "cmd": "./publisher -DCPSConfigFile /home/pi/ini/" + ini,
             "topic": topic
         });
         $.ajax({
@@ -142,7 +142,7 @@ $(function () {
         console.log(ini, topic);
         socket.emit('subscriberSend', {
             "active": "create",
-            "cmd": "./subscriber -DCPSConfigFile " + ini,
+            "cmd": "./subscriber -DCPSConfigFile /home/pi/ini/" + ini,
             "topic": topic
         });
         $.ajax({
