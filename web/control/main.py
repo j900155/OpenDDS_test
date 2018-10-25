@@ -14,7 +14,7 @@ import json
 import types
 from datetime import datetime
 from socketIO_client import SocketIO, LoggingNamespace
-
+import readConfig
 HOST = "0.0.0.0"
 pub_PORT = 9808
 sub_PORT = 9807
@@ -352,6 +352,8 @@ if __name__ =="__main__":
     print ("sub server start")
     subscriber_server.start()
 
+    readConfig.readConfig(pub_PORT,"pub.json")
+    readConfig.readConfig(sub_PORT,"sub.json")
     publish_server.join()
     subscriber_server.join()
     print ("end")
