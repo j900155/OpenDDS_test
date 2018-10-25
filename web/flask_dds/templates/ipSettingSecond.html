@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/img/opendds.png">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/static/css/ipSettingSecond.css" rel="stylesheet">
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#dhcp').click(function () {
+                $('#static').attr('checked', false);
+            })
+            $('#static').click(function () {
+                $('#dhcp').attr('checked', false);
+            })
+            $('#autoDNS').click(function () {
+                $('#staticDNS').attr('checked', false);
+            })
+            $('#staticDNS').click(function () {
+                $('#autoDNS').attr('checked', false);
+            })
+
+            function checkIP() {
+                let radio = $('input[name=ipMethod]:checked').val();
+                let staticIP = $('input[name=staticIP]').val();
+                let staticMask = $('input[name=staticMask]').val();
+                let staticGateway = $('input[name=staticGateway]').val();
+                if (radio == 'staticIP' && (staticIP == '' || staticMask == '' || staticGateway == '')) {
+                    alert("輸入框皆需輸入數值");
+                    return false;
+                } else if (radio == 'staticIP') {
+                    let staticIpCheck = staticIP.split('.');
+                    if (staticIpCheck.length == 4) {
+                        for (let i = 0; i < 4; i++) {
+                            let TheNum = Number(staticIpCheck[i]);
+                            if (TheNum >= 0 && TheNum <= 255) { } else {
+                                alert("IP位址格式錯誤");
+                                return false;
+                            }
+                        }
+                    } else {
+                        alert("IP位址格式錯誤");
+                        return false;
+                    }
+
+                    let staticMaskCheck = staticMask.split('.');
+                    if (staticMaskCheck.length == 4) {
+                        for (let i = 0; i < 4; i++) {
+                            let TheNum = Number(staticMaskCheck[i]);
+                            if (TheNum >= 0 && TheNum <= 255) { } else {
+                                alert("子網路遮罩格式錯誤");
+                                return false;
+                            }
+                        }
+                    } else {
+                        alert("子網路遮罩格式錯誤");
+                        return false;
+                    }
+
+                    let staticGatewayCheck = staticGateway.split('.');
+                    if (staticGatewayCheck.length == 4) {
+                        for (let i = 0; i < 4; i++) {
+                            let TheNum = Number(staticGatewayCheck[i]);
+                            if (TheNum >= 0 && TheNum <= 255) { } else {
+                                alert("預設閘道格式錯誤");
+                                return false;
+                            }
+                        }
+                    } else {
+                        alert("預設閘道格式錯誤");
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            }
+
+            function checkDNS() {
+                let radio = $('input[name=DNS]:checked').val();
+                let defaultDNS = $('input[name=defaultDNS]').val();
+                let otherDNS = $('input[name=otherDNS]').val();
+                if (radio == 'staticDNS' && (defaultDNS == '' || otherDNS == '')) {
+                    alert("輸入框皆需輸入數值");
+                    return false;
+                } else if (radio == 'staticDNS') {
+                    let defaultDNSCheck = defaultDNS.split('.');
+                    if (defaultDNSCheck.length == 4) {
+                        for (let i = 0; i < 4; i++) {
+                            let TheNum = Number(defaultDNSCheck[i]);
+                            if (TheNum >= 0 && TheNum <= 255) { } else {
+                                alert("慣用DNS伺服器格式錯誤");
+                                return false;
+                            }
+                        }
+                    } else {
+                        alert("慣用DNS伺服器格式錯誤");
+                        return false;
+                    }
+
+                    if (otherDNS != '') {
+                        let otherDNSCheck = otherDNS.split('.');
+                        if (otherDNSCheck.length == 4) {
+                            for (let i = 0; i < 4; i++) {
+                                let TheNum = Number(otherDNSCheck[i]);
+                                if (TheNum >= 0 && TheNum <= 255) { } else {
+                                    alert("其他DNS伺服器格式錯誤");
+                                    return false;
+                                }
+                            }
+                        } else {
+                            alert("其他DNS伺服器格式錯誤");
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+                return true;
+            }
+        })
+
+        window.onload = function () {
+            $('#reboot').on('click', function () {
+                if (window.confirm('確定要關機嗎？')) {
+                    $.ajax({
+                        type: "POST",
+                        url: "reboot",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify({ status: 'reboot' }),
+                        success: function (data) {
+                            console.log('success');
+                            window.location.reload(true);
+                        },
+                        error: function (data) {
+                            console.log('error');
+                            window.location.reload(true);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">DDS</a>
+            <button class="power-btn" id="reboot"><img src="/static/img/power.png" class="power-img"></button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active">
+                        <a href="/">系統設定
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="ipSettingMain">IP 設定(內建網卡）</a>
+                    </li>
+                    <li>
+                        <a href="ipSettingSecond">IP 設定(外接網卡）</a>
+                    </li>
+                    <li>
+                        <a href="iniCreate">ini 建立</a>
+                    </li>
+                    <li>
+                        <a href="iniUpdate">ini 列表及上傳</a>
+                    </li>
+                    <li>
+                        <a href="ping">網路診斷</a>
+                    </li>
+                    <li>
+                        <a href="logs">流量統計紀錄分析</a>
+                    </li>
+                    <li>
+                        <a href="sendTest">傳輸測試</a>
+                    </li>
+                    <li>
+                        <a href="rpiSetting">設定</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2 col-sm-9 col-sm-offset-3 col-xs-8 col-xs-offset-4 main">
+                <div class="row">
+                    <h1 class="page-header">IP 設定(外接網卡）</h1>
+                </div>
+                <div class="row">
+                    <h3>如過您的網路支援這項功能，您可以取得自動指派的IP設定，否則，您必須詢問網路系統管理員正確的IP設定</h3>
+                </div>
+                <div class="row">
+                    <form method="POST" action="/setIpSecond" onsubmit="return checkIP()">
+                        <div class="row radio-sty">
+                            <input type="radio" value="dhcpIP" name="ipMethod" id="dhcp" checked="checked">
+                            自動取得IP位址
+                        </div>
+                        <div class="row div-static-ip">
+                            <span class="span-radio">
+                                <input type="radio" value="staticIP" name="ipMethod" id="static">
+                                使用下列IP位址
+                            </span>
+                            <br>
+                            <div class="row">
+                                <div class="col-lg-2 col-lg-offset-1 col-md-2 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-4 col-xs-offset-1">
+                                    <span>IP位址:</span>
+                                </div>
+                                <div class="col-lg-9 col-md-2 col-sm-2 col-xs-4">
+                                    <input type="text" placeholder='xxx.xxx.xxx.xxx' name="staticIP">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-lg-2 col-lg-offset-1 col-md-2 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-4 col-xs-offset-1">
+                                    <span>子網路遮罩:</span>
+                                </div>
+                                <div class="col-lg-9 col-md-2 col-sm-2 col-xs-4">
+                                    <input type="text" placeholder='xxx.xxx.xxx.xxx' name="staticMask">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-lg-2 col-lg-offset-1 col-md-2 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-4 col-xs-offset-1">
+                                    <span>預設閘道:</span>
+                                </div>
+                                <div class="col-lg-9 col-md-2 col-sm-2 col-xs-4">
+                                    <input type="text" placeholder='xxx.xxx.xxx.xxx' name="staticGateway">
+                                </div>
+                                <input type="submit" value="更新" class="btn btn-update">
+                            </div>
+                            <br>
+                        </div>
+                    </form>
+                </div>
+                <br>
+                <div class="row">
+                    <form method="POST" action="/dnsSecond" onsubmit="return checkDNS()">
+                        <div class="row radio-sty">
+                            <input type="radio" value="autoDNS" name="DNS" id="autoDNS" checked="checked">
+                            自動取得DNS伺服器位址
+                        </div>
+                        <div class="row  div-static-ip">
+                            <span class="span-radio">
+                                <input type="radio" value="staticDNS" name="DNS" id="staticDNS">
+                                使用下列DNS伺服器位址
+                            </span>
+                            <br>
+                            <div class="row">
+                                <div class="col-lg-2 col-lg-offset-1 col-md-2 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-4 col-xs-offset-1">
+                                    <span>慣用DNS伺服器:</span>
+                                </div>
+                                <div class="col-lg-9 col-md-2 col-sm-2 col-xs-4">
+                                    <input type="text" placeholder='xxx.xxx.xxx.xxx' name="defaultDNS">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-lg-2 col-lg-offset-1 col-md-2 col-md-offset-1 col-sm-2 col-sm-offset-1 col-xs-4 col-xs-offset-1">
+                                    <span>其他DNS伺服器:</span>
+                                </div>
+                                <div class="col-lg-9 col-md-2 col-sm-2 col-xs-4">
+                                    <input type="text" placeholder='xxx.xxx.xxx.xxx' name="otherDNS">
+                                </div>
+                                <input type="submit" value="更新" class="btn btn-update">
+                            </div>
+                            <br>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="/static/js/jquery.min.js"><\/script>')
+    </script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/holder.min.js"></script>
+    <script src="/static/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+
+</html>
