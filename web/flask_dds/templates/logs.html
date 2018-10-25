@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/img/opendds.png">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/static/css/logs.css" rel="stylesheet">
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+
+    <script src="/static/js/jquery.min.js"></script>
+    <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="http://www.pureexample.com/js/flot/excanvas.min.js"></script><![endif]-->
+    <script>
+        let updateTimeSetting = 30000;
+        window.onload = function () {
+            $('#reboot').on('click', function () {
+                if (window.confirm('確定要關機嗎？')) {
+                    $.ajax({
+                        type: "POST",
+                        url: "reboot",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify({ status: 'reboot' }),
+                        success: function (data) {
+                            console.log('success');
+                            window.location.reload(true);
+                        },
+                        error: function (data) {
+                            console.log('error');
+                            window.location.reload(true);
+                        }
+                    });
+                }
+            });
+            $('#send').click(function () {
+                if ($(update).val() == 'short') {
+                    updateTimeSetting = 30000;
+                } else if ($(update).val() == 'medium') {
+                    updateTimeSetting = 60000;
+                } else if ($(update).val() == 'long') {
+                    updateTimeSetting = 300000;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "logsUpdateSetting",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ updateTime: updateTimeSetting }),
+                    success: function (data) {
+                        console.log('success');
+                        window.location.reload();
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        return false;
+                    }
+                });
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">DDS</a>
+            <button class="power-btn" id="reboot"><img src="/static/img/power.png" class="power-img"></button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active">
+                        <a href="/">系統設定
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="ipSettingMain">IP 設定(內建網卡）</a>
+                    </li>
+                    <li>
+                        <a href="ipSettingSecond">IP 設定(外接網卡）</a>
+                    </li>
+                    <li>
+                        <a href="iniCreate">ini 建立</a>
+                    </li>
+                    <li>
+                        <a href="iniUpdate">ini 列表及上傳</a>
+                    </li>
+                    <li>
+                        <a href="ping">網路診斷</a>
+                    </li>
+                    <li>
+                        <a href="logs">流量統計紀錄分析</a>
+                    </li>
+                    <li>
+                        <a href="sendTest">傳輸測試</a>
+                    </li>
+                    <li>
+                        <a href="rpiSetting">設定</a>
+                    </li>
+            </div>
+            <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2 col-sm-9 col-sm-offset-3 col-xs-8 col-xs-offset-4 main">
+                <h1 class="page-header">流量統計紀錄分析</h1>
+                <p class="inline">自動更新時間({{status}})：</p>
+                <select class="inline" id="update" name="update">
+                    <option value="short">30秒</option>
+                    <option value="medium">1分鐘</option>
+                    <option value="long">5分鐘</option>
+                </select>
+                <button id="send">送出</button>
+                <h3 class="chart-title">發送統計</h3>
+                <div class="row">
+                    <div class="chart-sty" id="chart1"></div>
+                </div>
+                <br>
+                <h3 class="chart-title">接收統計</h3>
+                <div class="row">
+                    <div class="chart-sty" id="chart2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="/static/js/jquery.min.js"><\/script>')
+    </script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/holder.min.js"></script>
+    <script src="/static/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/excanvas.min.js"></script>
+    <script type="text/javascript" src="/static/js/flot/jquery.flot.js"></script>
+    <script type="text/javascript" src="/static/js/flot/jquery.flot.time.js"></script>
+    <!--<script type="text/javascript" src="/static/js/flot/jquery.flot.axislabels.js"></script>-->
+    <script src="/static/js/jquery.flot.min.js"></script>
+    <script type="text/javascript">
+        let pubLogs = JSON.parse('{{ pubLogs }}');
+        let subLogs = JSON.parse('{{ subLogs }}');
+        let updateTime = JSON.parse('{{ updateTime }}');
+        $(document).ready(function () {
+            let dateUTC = function (value) {
+                return Date.UTC(new Date(value).getFullYear(), new Date(value).getMonth(), new Date(value).getDay(), new Date(value).getHours(), new Date(value).getMinutes(), new Date(value).getSeconds());
+            }
+            for (let i = 0; i < pubLogs.length; i++) {
+                pubLogs[i][0] = dateUTC(pubLogs[i][0])
+            }
+            for (let i = 0; i < subLogs.length; i++) {
+                subLogs[i][0] = dateUTC(subLogs[i][0])
+            }
+            var chart1 = $.plot($("#chart1"), [
+                {
+                    data: pubLogs,
+                    points: {
+                        show: true
+                    },
+                    lines: {
+                        show: true
+                    }
+                }
+            ], {
+                    grid: {
+                        backgroundColor: {
+                            colors: ["#B0D5FF", "#5CA8FF"]
+                        }
+                    },
+                    xaxis: {
+                        mode: "time",
+                        timezone: "local",
+                        timeformat: "%0H:%0M:%0S"
+                        // tickSize: [60, "second"]
+                    }
+                });
+            var chart2 = $.plot($("#chart2"), [
+                {
+                    data: subLogs,
+                    points: {
+                        show: true
+                    },
+                    lines: {
+                        show: true
+                    }
+                }
+            ], {
+                    grid: {
+                        backgroundColor: {
+                            colors: ["#B0D5FF", "#5CA8FF"]
+                        }
+                    },
+                    xaxis: {
+                        mode: "time",
+                        timezone: "browser",
+                        timeformat: "%0H:%0M:%0S"
+                        // tickSize: [60, "second"]
+                    }
+                });
+
+            setInterval(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "logsData",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ status: 'logsData' }),
+                    success: function (data) {
+                        console.log('success');
+                        let pubLogs = data.pubLogs;
+                        let subLogs = data.subLogs;
+                        for (let i = 0; i < pubLogs.length; i++) {
+                            pubLogs[i][0] = dateUTC(pubLogs[i][0])
+                        }
+                        for (let i = 0; i < subLogs.length; i++) {
+                            subLogs[i][0] = dateUTC(subLogs[i][0])
+                        }
+                        chart1.setData([pubLogs]);
+                        chart1.setupGrid();
+                        chart1.draw();
+                        chart2.setData([subLogs]);
+                        chart2.setupGrid();
+                        chart2.draw();
+                        console.log('update');
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        return false;
+                    }
+                });
+                console.log(updateTime);
+            }, updateTime);
+        });
+    </script>
+</body>
+
+</html>
