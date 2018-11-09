@@ -110,7 +110,7 @@ def createFile():
     print(data["ini_file_name"])
     try:
         if (data["transport_type"] != "rtps_udp" or data["transport_type"] == "rtps_udp" and data["endpoint_type"] == "default"):
-            os.system("cp ./ini/default.ini /home/pi/ini/" +
+            os.system("cp /home/pi/OpenDDS_test/web/flask_dds/ini/default.ini /home/pi/ini/" +
                       data["ini_file_name"]+".ini")
             os.system("sed -i s:DCPSBit=1/0:DCPSBit=" +
                       data["DCPSBit"]+": /home/pi/ini/" + data["ini_file_name"]+".ini")
@@ -124,10 +124,10 @@ def createFile():
                       data["transportConf_TTL"]+":' /home/pi/ini/" + data["ini_file_name"]+".ini")
         else:
             if(data["endpoint_type"] == "reader"):
-                os.system("cp ./ini/staticReader.ini /home/pi/ini/" +
+                os.system("cp /home/pi/OpenDDS_test/web/flask_dds/ini/staticReader.ini /home/pi/ini/" +
                           data["ini_file_name"]+".ini")
             elif(data["endpoint_type"] == "writer"):
-                os.system("cp ./ini/staticWriter.ini /home/pi/ini/" +
+                os.system("cp /home/pi/OpenDDS_test/web/flask_dds/ini/staticWriter.ini /home/pi/ini/" +
                           data["ini_file_name"]+".ini")
             os.system("sed -i s:DCPSBit=1/0:DCPSBit=" +
                       data["DCPSBit"]+": /home/pi/ini/" + data["ini_file_name"]+".ini")
@@ -265,7 +265,7 @@ def pubSetting():
         return abort(400)
     else:
         print(request.json, type(request.json))
-        with open('./db/pub.json', 'w') as outfile:
+        with open('/home/pi/OpenDDS_test/web/flask_dds/db/pub.json', 'w') as outfile:
             json.dump(request.json, outfile)
         return jsonify({'status': 'ok'})
 
@@ -276,7 +276,7 @@ def subSetting():
         return abort(400)
     else:
         print(request.json, type(request.json))
-        with open('./db/sub.json', 'w') as outfile:
+        with open('/home/pi/OpenDDS_test/web/flask_dds/db/sub.json', 'w') as outfile:
             json.dump(request.json, outfile)
         return jsonify({'status': 'ok'})
 

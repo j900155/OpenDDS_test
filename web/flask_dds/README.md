@@ -23,3 +23,5 @@ subscriber event
 {"active":"status"}
 {"active":"exit"}
 {"active":"kill"}
+
+sed -i '' s:DCPSBit=1/0:DCPSBit=" + data["DCPSBit"]+": ./ini/file/" + data["ini_file_name"]+".ini"

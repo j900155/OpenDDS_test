@@ -135,3 +135,7 @@ body {
     width:36px;
     height:36px;
 }
+
+.flotLabel {
+    text-align: right;
+}
