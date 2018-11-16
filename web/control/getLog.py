@@ -11,44 +11,44 @@ import os.path
 """
 return list
 """
-FilePath = "/home/zack/github/OpenDDS_test/web/control/log/"
+FilePath = "/home/pi/OpenDDS_test/web/control/log/"
 def main():
     #timeNow = "2018-10-11"
-    timeNow = time.strftime("%Y-%m-%d")
-    secNow = 1539235432
-    fileName ="/test/2018-10-11.txt"
-    #return get(timeNow,secNow,fileName,choose="")
-    return get(choose="pub")
+    secNow = 1542402369
+    fileName =FilePath+"pub2018-11-16.txt"
+    return get(secNow=secNow,fileName=fileName,choose="pub")
+    #return get(choose="pub")
 def get(timeNow=None,secNow=None,fileName=None,choose="pub"):
     global FilePath
-    if timeNow==None or secNow==None:
+    if timeNow==None and secNow==None:
         timeNow = time.strftime("%Y-%m-%d")
-        secNow = int(time.time())
+        secNow = int(time.time())+28800
         #print(secNow)
         #print(timeNow)
         fileName = FilePath+choose+str(timeNow)+".txt"
         print (fileName)
-    showLog = []
-    count = 0
+
     #print(fileName)
     if os.path.isfile(fileName):
         with open(fileName) as f:
             allFile = f.readlines()
+            checkTime = [0,0,0,0,0]
+            showLog = [[0,0],[0,0],[0,0],[0,0],[0,0]]
+            for i in range(0,5):
+                checkTime[i]= secNow-60*i
+                showLog[i][0] = secNow-60*i
             for rawFile in allFile:
                 rawFile = rawFile.replace("\n","")
                 sRawFile = rawFile.split(",")
-                if int(sRawFile[-1])>(secNow+count*60):
-                    dataLen = len(sRawFile[2:-2])
-                    dataLen = len(str(sRawFile[2:-2]))
-                    #print(sRawFile[-1])
-                    if int(sRawFile[-1])>(secNow+(count+1)*60) and count < 5:
-                        s = int(time.time()*1000)+count*60*1000
-                        showLog.append([s,dataLen])
-                        #print (s)
-                        count +=1
-                        #print(count)
-                    else:
-                        break
+                dataLen = len(str(sRawFile[2:-2]))
+                dataTime = int(sRawFile[-1])
+                print("dataTime {} dataLen {}".format(dataTime, dataLen))
+                for i in range(0,4):
+                    if dataTime < checkTime[i] and dataTime>= checkTime[i+1]:
+                        print(dataLen)
+                        showLog[i][1]+=dataLen
+            #for i in range(0,5):
+             #   showLog[i][0]=showLog[i][0]*1000
     else:
         return -1
     return showLog
