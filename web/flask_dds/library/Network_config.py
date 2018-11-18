@@ -252,17 +252,17 @@ class Net_config():
     def eth0_status(self):
         command = 'ip address show dev eth0 | grep "eth0" | awk "END {print}"'
         result = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        eth0 = str(result.communicate()[0]).split("\\n")[0].split("b'    ")[1]
-        eth0_ip = str(eth0.split(" ")[1].split('/')[0])
-        eth0_netmask = int(eth0.split(" ")[1].split('/')[1])
-        command = 'ip r show dev eth0 | grep default'
-        result = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        error_code = 0
         try:
-            eth0_gw = str(result.communicate()[0]).split(" ")[2]
+            eth0 = str(result.communicate()[0]).split("\\n")[0].split("b'    ")[1]
+            eth0_ip = str(eth0.split(" ")[1].split('/')[0])
+            eth0_netmask = int(eth0.split(" ")[1].split('/')[1])
         except:
-            eth0_gw = ""
+            error_code = 1
+            eth0_ip = "disconnect"
+            eth0_netmask = 0
 
-        if(eth0_netmask <= 8):
+        if(eth0_netmask <= 8 and error_code == 0):
             eth0_nm_end = ".0.0.0"
             value = 128
             count = 0
@@ -271,7 +271,7 @@ class Net_config():
                 value = value / 2
             eth0_nm = str(int(count)) + eth0_nm_end
             
-        elif(eth0_netmask <= 16 and eth0_netmask > 8):
+        elif(eth0_netmask <= 16 and eth0_netmask > 8 and error_code == 0):
             eth0_netmask = eth0_netmask - 8
             eth0_nm_head = "255."
             eth0_nm_end = ".0.0"
@@ -282,7 +282,7 @@ class Net_config():
                 value = value / 2
             eth0_nm = eth0_nm_head + str(int(count)) + eth0_nm_end
 
-        elif(eth0_netmask <= 24)and eth0_netmask > 16:
+        elif(eth0_netmask <= 24 and eth0_netmask > 16 and error_code == 0):
             eth0_netmask = eth0_netmask - 16
             eth0_nm_head = "255.255."
             eth0_nm_end = ".0"
@@ -293,7 +293,7 @@ class Net_config():
                 value = value / 2
             eth0_nm = eth0_nm_head + str(int(count)) + eth0_nm_end
 
-        elif(eth0_netmask <= 32 and eth0_netmask > 24):
+        elif(eth0_netmask <= 32 and eth0_netmask > 24 and error_code == 0):
             eth0_netmask = eth0_netmask - 24
             eth0_nm_head = "255.255.255."
             eth0_netmask = eth0_netmask
@@ -303,6 +303,15 @@ class Net_config():
                 count = count + value
                 value = value / 2
             eth0_nm = eth0_nm_head + str(int(count))
+        else:
+            eth0_nm = "disconnect"
+
+        command = 'ip r show dev eth0 | grep default'
+        result = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            eth0_gw = str(result.communicate()[0]).split(" ")[2]
+        except:
+            eth0_gw = "not use"
 
 #        print(eth0)
         print("eth0")
@@ -314,17 +323,17 @@ class Net_config():
     def eth1_status(self):
         command = 'ip address show dev eth1 | grep "eth1" | awk "END {print}"'
         result = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        eth1 = str(result.communicate()[0]).split("\\n")[0].split("b'    ")[1]
-        eth1_ip = eth1.split(" ")[1].split('/')[0]
-        eth1_netmask = int(eth1.split(" ")[1].split('/')[1])
-        command = 'ip r show dev eth1 | grep default'
-        result = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        error_code = 0
         try:
-            eth1_gw = str(result.communicate()[0]).split(" ")[2]
+            eth1 = str(result.communicate()[0]).split("\\n")[0].split("b'    ")[1]
+            eth1_ip = eth1.split(" ")[1].split('/')[0]
+            eth1_netmask = int(eth1.split(" ")[1].split('/')[1])
         except:
-            eth1_gw = ""
+            error_code = 1
+            eth1_ip = "disconnect"
+            eth1_netmask = 0
 
-        if(eth1_netmask <= 8):
+        if(eth1_netmask <= 8 and error_code == 0):
             eth1_nm_end = ".0.0.0"
             value = 128
             count = 0
@@ -333,7 +342,7 @@ class Net_config():
                 value = value / 2
             eth1_nm = str(int(count)) + eth1_nm_end
             
-        elif(eth1_netmask <= 16 and eth1_netmask > 8):
+        elif(eth1_netmask <= 16 and eth1_netmask > 8 and error_code == 0):
             eth1_netmask = eth1_netmask - 8
             eth1_nm_head = "255."
             eth1_nm_end = ".0.0"
@@ -344,7 +353,7 @@ class Net_config():
                 value = value / 2
             eth1_nm = eth1_nm_head + str(int(count)) + eth1_nm_end
 
-        elif(eth1_netmask <= 24)and eth1_netmask > 16:
+        elif(eth1_netmask <= 24 and eth1_netmask > 16 and error_code == 0):
             eth1_netmask = eth1_netmask - 16
             eth1_nm_head = "255.255."
             eth1_nm_end = ".0"
@@ -355,7 +364,7 @@ class Net_config():
                 value = value / 2
             eth1_nm = eth1_nm_head + str(int(count)) + eth1_nm_end
 
-        elif(eth1_netmask <= 32 and eth1_netmask > 24):
+        elif(eth1_netmask <= 32 and eth1_netmask > 24 and error_code == 0):
             eth1_netmask = eth1_netmask - 24
             eth1_nm_head = "255.255.255."
             value = 128
@@ -364,6 +373,15 @@ class Net_config():
                 count = count + value
                 value = value / 2
             eth1_nm = eth1_nm_head + str(int(count))
+        else:
+            eth1_nm = "disconnect"
+
+        command = 'ip r show dev eth1 | grep default'
+        result = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            eth1_gw = str(result.communicate()[0]).split(" ")[2]
+        except:
+            eth1_gw = "not use"
 
 #        print(eth1)
         print("eth1")
@@ -379,6 +397,7 @@ class Net_config():
         os.system("sudo sed -i '6c \\ ' /etc/network/interfaces")
         os.system('sudo ifdown eth0')
         os.system('sudo ifup --ignore-errors eth0')
+        os.system('sudo supervisorctl restart all')
         os.system('sudo cp /etc/network/interfaces ./library/interfaces.bak')
 
     def eth1_dhcp(self):
@@ -392,7 +411,9 @@ class Net_config():
 #        self.usb_id = open('/tmp/usb.txt')
 #        self.usb_reset = 'sudo python /etc/network/Restusb.py -d ' + self.usb_id.read()
 #        os.system(self.usb_reset)
+        os.system('sudo supervisorctl restart all')
         os.system('sudo cp /etc/network/interfaces /etc/network/interfaces.bak')
+
 
     def eth0_static(self, ip, netmask, gateway):
         os.system("sudo sed -i '3c iface eth0 inet static' /etc/network/interfaces")
