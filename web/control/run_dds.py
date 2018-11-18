@@ -5,6 +5,7 @@
 
 
 from subprocess import Popen, PIPE, STDOUT
+import subprocess
 #from multiprocessing import Process, Queue
 import  threading
 import time
@@ -24,25 +25,14 @@ class run_pub(threading.Thread):
         print("publish init")
     def run(self):
         print ("dds publish start")
-        print self.pub_cmd
-        self.pub = Popen(self.pub_cmd.split(" "), stdin=PIPE,stdout=PIPE, stderr=STDOUT)
-        print str(self.pub.pid)
-        get_return = ""
-        while(self.pub.poll() == None):
-            get_return = (self.pub.stdout.readline())
-            print("pub " + str(get_return))
-            if(get_return == "topic name? \n"):
-                self.pub.stdin.write(self.topic+"\n")
-            elif(get_return == "delay us\n"):
-                delay_time = str(int(self.set_pub_time* 1000)) + "\n"
-                self.pub.stdin.write(delay_time)
-            elif(get_return =="exit\n"):
-                print("pub exit")
-                self.pub.stdin.write("exit\n")
-                print str(self.pub.wait())
-                break
-            else:
-                print(get_return)
+        print (self.pub_cmd)
+        self.pub = Popen(self.pub_cmd.split(" "))
+        while(self.pub.returncode == None):
+            time.sleep(1)
+        print ("54")
+        return 0
+    def kill():
+        self.pub.kill()
         return 0
 class run_sub(threading.Thread):
     def __init__(self, sub_cmd,topic="A", set_sub_time = 10):
@@ -66,7 +56,7 @@ class run_sub(threading.Thread):
                 sub.kill()
                 break
             elif(get_return =="file name\n"):
-                print "sub" + get_return
+                print ("sub" + get_return)
                 sub.stdin.write("run_test\n")
         return 0
 

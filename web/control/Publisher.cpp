@@ -18,6 +18,7 @@
 
 #include "MessengerTypeSupportImpl.h"
 #include <iostream>
+#include <fstream>
 
 //time stamp
 #include <sys/time.h>
@@ -26,9 +27,43 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-int
-ACE_TMAIN(int argc, ACE_TCHAR *argv[])
+#include <ctime>
+#define UTC (+8)
+int startSocket(int *sockfd, struct sockaddr_in *remote_addr)
 {
+	*sockfd = socket(AF_INET,SOCK_STREAM,0);
+	if(*sockfd ==-1)
+	{
+		std::cout << "create socket error \n";
+		return -1;
+	}
+	memset(remote_addr,0,sizeof(*remote_addr));
+	remote_addr->sin_family=AF_INET;
+	remote_addr->sin_addr.s_addr=inet_addr("127.0.0.1");
+	remote_addr->sin_port=htons(9808);
+
+	if(connect(*sockfd,(struct sockaddr *)remote_addr,sizeof(struct sockaddr))<0)
+	{
+		std::cout << "sock connect err" << std::endl;
+		return -1;
+	}
+	send(*sockfd,"publisher",9,0);
+
+	return 0;
+}
+int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
+{
+	int sockfd = 0;
+	struct sockaddr_in remote_addr;
+	const int BUFFSIZE = 200;
+	char buf[BUFFSIZE];
+	int len;
+	memset(buf,0,sizeof(buf));
+	fstream fp;
+	fp.open("publish.log", std::fstream::out | std::fstream::app);
+	startSocket(&sockfd,&remote_addr);
+	fp<< "socket start" << std::endl;
+	std::string text;
   try {
     // Initialize DomainParticipantFactory
     DDS::DomainParticipantFactory_var dpf =
@@ -62,12 +97,20 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
     // Create Topic (Movie Discussion List)
 	std::string topic_name;
-	std::cout << "topic name? \n";
-	std::cin >> topic_name;
+	len = recv(sockfd, buf,BUFFSIZE,0);
+	//topic_name = buf;
+	//topic_name = recvTostr(buf,len);
+	//std::cout << "topic name? \n";
+	//std::cin >> topic_name;
+	buf[len] = '\0';
+	topic_name = buf;
 	std::cout << "topic name " << topic_name << std::endl;
-    CORBA::String_var type_name = ts->get_type_name();
+	fp << "topic name " << topic_name << std::endl;
+	
+	    CORBA::String_var type_name = ts->get_type_name();
     DDS::Topic_var topic =
-      participant->create_topic(topic_name.c_str(),
+      participant->create_topic(//topic_name.c_str(),
+								buf,
                                 type_name,
                                 TOPIC_QOS_DEFAULT,
                                 0,
@@ -117,87 +160,91 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
                        -1);
     }
 	std::cout << "socket start" << std::endl;
-	int sockfd = 0;
-	sockfd = socket(AF_INET,SOCK_STREAM,0);
-	if(sockfd ==-1)
-	{
-		std::cout << "create socket error \n";
-		return -1;
-	}
-	struct sockaddr_in remote_addr;
-	const int BUFFSIZE = 200;
-	char buf[BUFFSIZE];
-	int len;
-	memset(&remote_addr,0,sizeof(remote_addr));
-	memset(buf,0,sizeof(buf));
-	remote_addr.sin_family=AF_INET;
-	remote_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
-	remote_addr.sin_port=htons(9808);
+	int delay_us = 200;
+	//std::cout << "delay us" << std::endl;
+	//std::cin >> delay_us;
 
-	if(connect(sockfd,(struct sockaddr *)&remote_addr,sizeof(struct sockaddr))<0)
-	{
-		std::cout << "sock connect err" << std::endl;
-		return -1;
-	}
-	send(sockfd,"publisher",9,0);
 	//time
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
+	fstream fpLog;
+	time_t t=time(NULL);
+	tm* timePtr = localtime(&t);
+	std::string fileName = "";
+	int year = timePtr->tm_year+1900;
+	int month = timePtr->tm_mon+1;
+	int day = timePtr->tm_mday;
+	len = sprintf(buf,"pub%d-%d-%d.txt",year,month,day);
+	buf[len]='\0';
+	fileName = buf;
+	fileName ="./log/" + fileName;
+	fp << "fileName " << fileName << std::endl;
+	//fileName = "sub"+year+"-"+month+"-"+day+".txt".
+	fpLog.open(fileName, std::fstream::out | std::fstream::app);
+
     // Write samples
-	std::string text;
 	long c = 0;
-	int delay_us = 100000;
 	int i;
-	//std::cout << "delay us" << std::endl;
-	//std::cin >> delay_us;
+	char end = '\0';
 	Messenger::Message message;
 	DDS::ReturnCode_t error;
 	gettimeofday(&tv,NULL);
 //	t = tv.tv_sec;
 	while(true)
 	{
+		fp << "while " << c  << std::endl;
 		len = recv(sockfd, buf,BUFFSIZE,0);
+		fp << "while 180 " << c  << std::endl;
 		if(len > 0)
 		{
+			fp<< "get data " << len <<" ";
 			std::cout <<len << " " << buf << std::endl;
 			c++;
 			//message.sendData = "AAAAAAAA";
-
-			for(i=0;i<len;i++)
-			{
-				text += buf[i];
-			}
+			buf[len] = end;
+			//message.sendData = buf;
+			text = buf;
 			message.sendData = text.c_str();
-
-			if(strcmp(buf,"exit") == 0)
+			fp << " data "<<text << std::endl;
+			std::cout << "193" << std::endl;
+			if(text.compare("exit") == 0)
 			{
 				error = message_writer->write(message, DDS::HANDLE_NIL);
 				std::cout << "exit\n";
 				break;
 			}
-			else if(strcmp(buf,"heartbeat")==0)
+			else if(text.compare("heartbeat")==0)
 			{
 				send(sockfd,"alive",5,0);
 			}
+			std::cout << "203" << std::endl;
 			gettimeofday(&tv,NULL);
 			//int sec = tv.tv_sec%100;
 			//message.sendTime = (tv.tv_usec + sec*1000000);
-			message.sendTime = tv.tv_sec;
+			message.sendTime = tv.tv_sec + 28800;
 			message.c = c;
 			error = message_writer->write(message, DDS::HANDLE_NIL);
-			  if (error != DDS::RETCODE_OK)
-			  {
+			fpLog << "message_data," << message.sendData << ",message_time," << message.sendTime  << std::endl;
+			if (error != DDS::RETCODE_OK)
+			{
+				fp<< "error" << std::endl;
 				ACE_ERROR((LM_ERROR,
 				ACE_TEXT("ERROR: %N:%l: main() -"),
 				ACE_TEXT(" write returned %d!\n"), error));
 			}
 			std::cout << "ok " << c  << std::endl;
-			memset(buf,0,BUFFSIZE);
+			memset(buf,0,BUFFSIZE-1);
 			text = "";
+		}
+		else
+		{
+			fp <<"err" <<  len << std::endl;
+			break;
 		}
 		usleep(delay_us);
 	}
 	close(sockfd);
+	fp << "end" << std::endl;
 	message.sendData = "end";
 	error = message_writer->write(message, DDS::HANDLE_NIL);
     // Wait for samples to be acknowledged
@@ -210,6 +257,7 @@ ACE_TMAIN(int argc, ACE_TCHAR *argv[])
                        -1);
     }
 	std::cout << "clean" << std::endl;
+	fp.close();
     // Clean-up!
     participant->delete_contained_entities();
     dpf->delete_participant(participant);

@@ -2,3 +2,4 @@ Messenger*.h
 Messenger*.cpp
 GNUmakefile*
 Messenger*.ini
+.depend.*

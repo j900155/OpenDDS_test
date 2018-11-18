@@ -1,0 +1,16 @@
+auto lo eth0
+
+iface eth0 inet dhcp
+
+
+
+dns-nameserver 8.8.8.8
+
+
+allow-hotplug eth1
+
+iface eth1 inet dhcp
+
+
+
+dns-nameserver 8.8.8.8

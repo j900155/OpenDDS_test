@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/img/opendds.png">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/static/css/index.css" rel="stylesheet">
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+    <script>
+        window.onload = function () {
+            $('#reboot').on('click', function () {
+                if (window.confirm('確定要關機嗎？')) {
+                    $.ajax({
+                        type: "POST",
+                        url: "reboot",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify({ status: 'reboot' }),
+                        success: function (data) {
+                            console.log('success');
+                            window.location.reload(true);
+                        },
+                        error: function (data) {
+                            console.log('error');
+                            window.location.reload(true);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">DDS</a>
+            <button class="power-btn" id="reboot"><img src="/static/img/power.png" class="power-img"></button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active">
+                        <a href="/">系統設定
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="ipSettingMain">IP 設定(內建網卡）</a>
+                    </li>
+                    <li>
+                        <a href="ipSettingSecond">IP 設定(外接網卡）</a>
+                    </li>
+                    <li>
+                        <a href="iniCreate">ini 建立</a>
+                    </li>
+                    <li>
+                        <a href="iniUpdate">ini 列表及上傳</a>
+                    </li>
+                    <li>
+                        <a href="ping">網路診斷</a>
+                    </li>
+                    <li>
+                        <a href="logs">流量統計紀錄分析</a>
+                    </li>
+                    <li>
+                        <a href="sendTest">傳輸測試</a>
+                    </li>
+                    <li>
+                        <a href="rpiSetting">設定</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2 col-sm-9 col-sm-offset-3 col-xs-8 col-xs-offset-4 main">
+                <h1 class="page-header">Dashboard</h1>
+                <div class="select-sty">
+                    <h2>eth0(內建網卡）:</h2>
+                    <h3>IP:{{eth0IP}}</h3>
+                    <h3>NetMask:{{eth0NetMask}}</h3>
+                    {% if eth0gateway != '' %}
+                    <h3>GateWay:{{eth0gateway}}</h3>
+                    {% endif %}
+                </div>
+                <div class="select-sty">
+                    <h2>eth1(外接網卡）:</h2>
+                    <h3>IP:{{eth1IP}}</h3>
+                    <h3>NetMask:{{eth1NetMask}}</h3>
+                    {% if eth1gateway != '' %}
+                    <h3>GateWay:{{eth1gateway}}</h3>
+                    {% endif %}
+                </div>
+                <div class="row placeholders"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="/static/js/jquery.min.js"><\/script>')
+    </script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/holder.min.js"></script>
+    <script src="/static/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+
+</html>

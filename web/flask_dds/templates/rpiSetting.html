@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/img/opendds.png">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/static/css/rpiSetting.css" rel="stylesheet">
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        window.onload = function () {
+            $('#dateMethod').change(function () {
+                if ($(this).val() == 'manual') {
+                    $('.date-set').show();
+                } else {
+                    $('.date-set').hide();
+                }
+
+                if ($(this).val() == 'ntp') {
+                    $('.set-ntp-display').show();
+                } else {
+                    $('.set-ntp-display').hide();
+                }
+            });
+            $('#setTime').on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "setRpiTime",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ dateMethod: $('#dateMethod').val(), date: $('#setDateVal').val(), time: $('#setTimeVal').val(), ntp: $('#setNtpVal').val() }),
+                    success: function (data) {
+                        console.log('success');
+                        console.log(data);
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $("#setWatchDog1").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "setWatchDog1",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ setWatchDogVal1: $('#setWatchDogVal1').val() }),
+                    success: function (data) {
+                        console.log('success');
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $("#setWatchDog5").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "setWatchDog5",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ setWatchDogVal5: $('#setWatchDogVal5').val() }),
+                    success: function (data) {
+                        console.log('success');
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $("#setWatchDog15").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "setWatchDog15",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ setWatchDogVal15: $('#setWatchDogVal15').val() }),
+                    success: function (data) {
+                        console.log('success');
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $("#setWatchDogTemp").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "setWatchDogTemp",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ setWatchDogValTemp: $('#setWatchDogValTemp').val() }),
+                    success: function (data) {
+                        console.log('success');
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $("#watchDogCancel1").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "watchDogCancel1",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ status: 'stop' }),
+                    success: function (data) {
+                        console.log('success');
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $("#watchDogCancel5").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "watchDogCancel5",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ status: 'stop' }),
+                    success: function (data) {
+                        console.log('success');
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $("#watchDogCancel15").on('click', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "watchDogCancel15",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({ status: 'stop' }),
+                    success: function (data) {
+                        console.log('success');
+                        if (!alert('已更新狀態：' + data.status)) {
+                            window.location.reload(true);
+                        }
+                    },
+                    error: function (data) {
+                        console.log('error');
+                        alert('更新失敗')
+                        return false;
+                    }
+                });
+            });
+            $('#reboot').on('click', function () {
+                if (window.confirm('確定要關機嗎？')) {
+                    $.ajax({
+                        type: "POST",
+                        url: "reboot",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify({ status: 'reboot' }),
+                        success: function (data) {
+                            console.log('success');
+                            window.location.reload(true);
+                        },
+                        error: function (data) {
+                            console.log('error');
+                            window.location.reload(true);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">DDS</a>
+        </div>
+        <button class="power-btn" id="reboot"><img src="/static/img/power.png" class="power-img"></button>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active">
+                        <a href="/">系統設定
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="ipSettingMain">IP 設定(內建網卡）</a>
+                    </li>
+                    <li>
+                        <a href="ipSettingSecond">IP 設定(外接網卡）</a>
+                    </li>
+                    <li>
+                        <a href="iniCreate">ini 建立</a>
+                    </li>
+                    <li>
+                        <a href="iniUpdate">ini 列表及上傳</a>
+                    </li>
+                    <li>
+                        <a href="ping">網路診斷</a>
+                    </li>
+                    <li>
+                        <a href="logs">流量統計紀錄分析</a>
+                    </li>
+                    <li>
+                        <a href="sendTest">傳輸測試</a>
+                    </li>
+                    <li>
+                        <a href="rpiSetting">設定</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2 col-sm-9 col-sm-offset-3 col-xs-8 col-xs-offset-4 main">
+                <h1 class="page-header">設定</h1>
+                <h2>時間設定（現在時間:{{nowTime}}）</h2>
+                <div class="setTime">
+                    <div><br>
+                        <p class="inline">（1）對時方式：</p>
+                        <select id="dateMethod" name="dateMethod">
+                            <option value="manual">手動對時</option>
+                            <option value="gps">GPS對時</option>
+                            <option value="ntp">NTP對時</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div class="date-set">
+                        <p class="inline">（2）日期設定：</p>
+                        <input type="date" class="date" id="setDateVal" name="date" /><br><br>
+                        <p class="inline">（3）時間設定：</p>
+                        <input type="time" class="date" id="setTimeVal" name="time" />
+                    </div>
+                    <div class="set-ntp-display">
+                        <p class="inline">（2）NTP設定：</p>
+                        <input type="text" class="date" id="setNtpVal" name="ntp" placeholder="{{ntpVal}}" /><br>
+                    </div>
+                    <input class="btn btn-primary btn-lg btn-sty" type="button" id="setTime" value="送出" /><br><br><br>
+                </div><br>
+                <h2>Watch Dog 設定</h2>
+                <div class="setWatchDog row"><br>
+                    <div class="watch-dog-sty row">
+                        <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12">
+                            <p class="inline">1分鐘 (建議需大於等於24且小於等於100)：</p>
+                        </div>
+                        <div class="col-lg-7 col-md-5 col-sm-12 col-xs-12 dev-text-sty">
+                            <input type="number" id="setWatchDogVal1" placeholder="{{watchDogVal1}}">
+                            <button id="watchDogCancel1">取消</button>
+                            <button id="setWatchDog1">送出</button>
+                        </div>
+                    </div><br>
+                    <div class="watch-dog-sty row">
+                        <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12">
+                            <p class="inline">5分鐘（建議需大於等於20且小於等於100)：</p>
+                        </div>
+                        <div class="col-lg-7 col-md-5 col-sm-12 col-xs-12 dev-text-sty">
+                            <input type="number" id="setWatchDogVal5" placeholder="{{watchDogVal5}}">
+                            <button id="watchDogCancel5">取消</button>
+                            <button id="setWatchDog5">送出</button>
+                        </div>
+                    </div><br>
+                    <div class="watch-dog-sty row">
+                        <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12">
+                            <p class="inline">15分鐘（建議需大於等於20且小於等於100)：</p>
+                        </div>
+                        <div class="col-lg-7 col-md-5 col-sm-12 col-xs-12 dev-text-sty">
+                            <input type="number" id="setWatchDogVal15" placeholder="{{watchDogVal15}}">
+                            <button id="watchDogCancel15">取消</button>
+                            <button id="setWatchDog15">送出</button>
+                        </div>
+                    </div><br>
+                    <div class="watch-dog-sty row">
+                        <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12">
+                            <p class="inline">CPU溫度（建議需大於等於40且小於等於100)：</p>
+                        </div>
+                        <div class="col-lg-7 col-md-5 col-sm-12 col-xs-12 dev-text-sty">
+                            <input type="number" id="setWatchDogValTemp" placeholder="{{watchDogValTemp}}">
+                            <button id="setWatchDogTemp">送出</button>
+                        </div>
+                    </div><br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScrip ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/jquery.min.js "></script>
+    <script>
+        window.jQuery || document.write('<script src="/static/js/jquery.min.js "><\/script>')
+    </script>
+    <script src="/static/js/bootstrap.min.js "></script>
+    <script src="/static/js/holder.min.js "></script>
+</body>
+
+</html>

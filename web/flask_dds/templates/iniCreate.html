@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/img/opendds.png">
+
+    <title>Dashboard Template for Bootstrap</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/static/css/iniCreate.css" rel="stylesheet">
+    <script src="/static/js/ie-emulation-modes-warning.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#endpoint").show();
+            $("#transport_type").change(function () {
+                if ($(this).val() == "rtps_udp") {
+                    $("#endpoint").show();
+                } else {
+                    $("#endpoint").hide();
+                }
+            });
+            $("#endpoint_type").change(function () {
+                if ($(this).val() == "default") {
+                    $("#QoS").hide();
+                } else {
+                    $("#QoS").show();
+                }
+            });
+
+            $("#send").click(function () {
+                let ini_file_name = $("#ini_file_name").val();
+                let transport_type = $("#transport_type").val();
+                let transportConf_TTL = $("#transportConf_TTL").val();
+                let DCPSBit = $("#DCPSBit").val();
+                let Scheduler = $("#Scheduler").val();
+                let discovery_TTL = $("#discovery_TTL").val();
+                let endpoint_type = $("#endpoint_type").val();
+                let history_kind = (endpoint_type != "default") ? $("#history_kind").val() : null;
+                let reliability_kind = (endpoint_type != "default") ? $("#reliability_kind").val() : null;
+                console.log(ini_file_name, transport_type, transportConf_TTL, DCPSBit, Scheduler, discovery_TTL, endpoint_type, history_kind, reliability_kind);
+                $.ajax({
+                    type: "POST",
+                    url: "createFile",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({
+                        ini_file_name: (ini_file_name != "") ? ini_file_name : endpoint_type,
+                        transport_type: transport_type,
+                        transportConf_TTL: transportConf_TTL,
+                        DCPSBit: DCPSBit,
+                        Scheduler: Scheduler,
+                        discovery_TTL: discovery_TTL,
+                        endpoint_type: endpoint_type,
+                        history_kind: history_kind,
+                        reliability_kind: reliability_kind
+                    }),
+                    success: function (result) {
+                        console.log(result.success);
+                        $("#ini_file_name").val('');
+                        alert("建檔成功");
+                    },
+                    error: function (result) {
+                        console.log(JSON.parse(result.responseText).error);
+                        $("#ini_file_name").val('');
+                        alert("建檔失敗");
+                        return false;
+                    }
+                });
+            });
+        });
+        window.onload = function () {
+            $('#reboot').on('click', function () {
+                if (window.confirm('確定要關機嗎？')) {
+                    $.ajax({
+                        type: "POST",
+                        url: "reboot",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify({ status: 'reboot' }),
+                        success: function (data) {
+                            console.log('success');
+                            window.location.reload(true);
+                        },
+                        error: function (data) {
+                            console.log('error');
+                            window.location.reload(true);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">DDS</a>
+            <button class="power-btn" id="reboot"><img src="/static/img/power.png" class="power-img"></button>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 sidebar">
+                <ul class="nav nav-sidebar">
+                    <li class="active">
+                        <a href="/">系統設定
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="ipSettingMain">IP 設定(內建網卡）</a>
+                    </li>
+                    <li>
+                        <a href="ipSettingSecond">IP 設定(外接網卡）</a>
+                    </li>
+                    <li>
+                        <a href="iniCreate">ini 建立</a>
+                    </li>
+                    <li>
+                        <a href="iniUpdate">ini 列表及上傳</a>
+                    </li>
+                    <li>
+                        <a href="ping">網路診斷</a>
+                    </li>
+                    <li>
+                        <a href="logs">流量統計紀錄分析</a>
+                    </li>
+                    <li>
+                        <a href="sendTest">傳輸測試</a>
+                    </li>
+                    <li>
+                        <a href="rpiSetting">設定</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-10 col-lg-offset-2 col-md-10 col-md-offset-2 col-sm-9 col-sm-offset-3 col-xs-8 col-xs-offset-4 main">
+                <h1 class="page-header">ini建立</h1>
+                <span>ini 檔案名稱：</span>
+                <input type="text" value="" id="ini_file_name">
+                <h3>1、transportConf 設定</h3>
+                <div class="row select-sty">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <h4>(1) transport_type：</h4>
+                        <select name="transport_type" id="transport_type">
+                            <option value="rtps_udp">rtps_udp</option>
+                            <option value="tcp">tcp</option>
+                            <option value="udp">udp</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <h4>(2) TTL：</h4>
+                        <select name="transportConf_TTL" id="transportConf_TTL">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+                <h3>2、common 設定</h3>
+                <div class="row select-sty">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <h4>(1) DCPSBit：</h4>
+                        <select name="DCPSBit" id="DCPSBit">
+                            <option value="1">1</option>
+                            <option value="0">0</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-10 col-xs-8">
+                        <h4>(2) Scheduler：</h4>
+                        <select name="Scheduler" id="Scheduler">
+                            <option value="SCHED_OTHER">SCHED_OTHER</option>
+                            <option value="SCHED_RR">SCHED_RR</option>
+                            <option value="SCHED_FIFO">SCHED_FIFO</option>
+                        </select>
+                    </div>
+                </div>
+                <h3>3、discovery 設定</h3>
+                <div class="row select-sty">
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <h4>(1) TTL：</h4>
+                        <select name="discovery_TTL" id="discovery_TTL">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="endpoint">
+                    <h3>4、endpoint 設定</h3>
+                    <div class="row select-sty">
+                        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                            <h4>(1) type：</h4>
+                            <select name="endpoint_type" id="endpoint_type">
+                                <option value="default">default</option>
+                                <option value="reader">reader</option>
+                                <option value="writer">writer</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="QoS">
+                    <h3>5、QoS 設定</h3>
+                    <div class="row select-sty">
+                        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                            <h4>(1) history.kind：</h4>
+                            <select name="history_kind" id="history_kind">
+                                <option value="KEEP_LAST">KEEP_LAST</option>
+                                <option value="KEEP_ALL">KEEP_ALL</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                            <h4>(2) reliability.kind：</h4>
+                            <select name="reliability_kind" id="reliability_kind">
+                                <option value="RELIABLE">RELIABLE</option>
+                                <option value="BEST_EFFORT">BEST_EFFORT</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg" type="submit" id="send">送出</button>
+            </div>
+        </div>
+
+        <!-- Bootstrap core JavaScript ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script>
+            window.jQuery || document.write('<script src="/static/js/jquery.min.js"><\/script>')
+        </script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/holder.min.js"></script>
+        <script src="/static/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+
+</html>

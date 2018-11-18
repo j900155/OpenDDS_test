@@ -6,3 +6,5 @@ subscriber
 MessengerType*
 *.txt
 *.inl
+.obj/*
+__pycache__/*
