@@ -30,10 +30,20 @@ def readConfig(port=0,fileName=""):
                 print(jdata["rtps"])
             except keyError:
                 return -2
-            
+            cmd = {}
+            if jdata["type"]=="pub":
+                port = 9808
+                cmd["cmd"]="./publisher -DCPSConfigFile " + readFile
+            elif jdata["type"]=="sub":
+                port = 9807
+                cmd["cmd"]="./subscriber -DCPSConfigFile " + readFile
+            else:
+                return -3
+            cmd["topic"]=jdata["topic"]
+            print(str(cmd)) 
             sendSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sendSocket.connect((hostIP,port))
-            b = str.encode(s)
+            b = str.encode(str(cmd))
             sendSocket.send(b)
             r = sendSocket.recv(1024)
             print(r)
@@ -42,6 +52,6 @@ def readConfig(port=0,fileName=""):
         return -1
 if __name__ =="__main__":
     print("test")
-    r = readConfig(port=9808,fileName="pub.json")
+    r = readConfig(port=0,fileName="pub.json")
     print (r)
 
