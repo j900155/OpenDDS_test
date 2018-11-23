@@ -13,7 +13,7 @@ socket.on('publishReturn', function (evt) {
     if (data == 'create' || data == 'exist' || data == 'kill' || data == 'not create') {
         //send message from b to a
         let li_A = document.createElement("li");
-        li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' class='message-img' height='31px'><div>" + 'publish狀態：' + data + "</div></div>"
+        li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' class='message-img' height='31px'><div>" + new Date().toLocaleString() + ' publish狀態：' + data + "</div></div>"
         ul_A.appendChild(li_A);
         let listA = document.getElementById("listA");
         listA.scrollTop = listA.scrollHeight;
@@ -29,7 +29,7 @@ socket.on('subscriberReturn', function (evt) {
     try {
         //send message from b to a
         let li_A = document.createElement("li");
-        li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' height='31px'><div>" + 'subscriber狀態：' + data + "</div></div>"
+        li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' height='31px'><div>" + new Date().toLocaleString() + ' subscriber狀態：' + data + "</div></div>"
         ul_A.appendChild(li_A);
         let listA = document.getElementById("listA");
         listA.scrollTop = listA.scrollHeight;
@@ -45,7 +45,7 @@ socket.on('subscriberRecevie', function (evt) {
     if (data == 'create' || data == 'start subscriber recevie' || data == 'not create' || data == 'exist' || data == 'kill') {
         //send message from b to a
         let li_A = document.createElement("li");
-        li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' height='31px'><div>" + 'subscriber狀態：' + data + "</div></div>"
+        li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' height='31px'><div>" + new Date().toLocaleString() + ' subscriber狀態：' + data + "</div></div>"
         ul_A.appendChild(li_A);
         let listA = document.getElementById("listA");
         listA.scrollTop = listA.scrollHeight;
@@ -60,7 +60,7 @@ socket.on('subscriberRecevie', function (evt) {
                 console.log('2');
                 //send message from a to a
                 let li_A = document.createElement("li");
-                li_A.innerHTML = "<div class = 'message-a-to-a-sty' ><div>" + userMsg + "</div></div>";
+                li_A.innerHTML = "<div class = 'message-a-to-a-sty' ><div>" + new Date().toLocaleString() + userMsg + "</div></div>";
                 ul_A.appendChild(li_A);
                 let listA = document.getElementById("listA");
                 listA.scrollTop = listA.scrollHeight;
@@ -70,7 +70,7 @@ socket.on('subscriberRecevie', function (evt) {
                 console.log('3');
                 console.log(userMsgID, userMsg)
                 let li_A = document.createElement("li");
-                li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' height='31px'><div>" + 'subscriber接收到的資料：' + userMsg + "</div></div>"
+                li_A.innerHTML = "<div class = 'message-b-to-a-sty' ><img src='/static/img/opendds.png' alt='B' class='message-img' width='31px' height='31px'><div>" + new Date().toLocaleString() + ' subscriber接收到的資料：' + userMsg + "</div></div>"
                 ul_A.appendChild(li_A);
                 var listA = document.getElementById("listA");
                 listA.scrollTop = listA.scrollHeight;
