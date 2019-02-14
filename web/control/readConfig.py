@@ -13,7 +13,8 @@ import socket
 from os.path import isfile
 import json
 hostIP="0.0.0.0"
-filePath="/home/zack/github/OpenDDS_test/web/control/"
+filePath="/home/pi/OpenDDS_test/web/flask_dds/db/"
+IniFilePath="/home/pi/ini/"
 
 def readConfig(port=0,fileName=""):
     readFile =filePath+fileName
@@ -30,20 +31,19 @@ def readConfig(port=0,fileName=""):
                 print(jdata["rtps"])
             except keyError:
                 return -2
-            cmd = {}
-            if jdata["type"]=="pub":
-                port = 9808
-                cmd["cmd"]="./publisher -DCPSConfigFile " + readFile
-            elif jdata["type"]=="sub":
-                port = 9807
-                cmd["cmd"]="./subscriber -DCPSConfigFile " + readFile
-            else:
-                return -3
-            cmd["topic"]=jdata["topic"]
-            print(str(cmd)) 
+            jdata["rtps"]=IniFilePath+jdata["rtps"]
             sendSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sendSocket.connect((hostIP,port))
-            b = str.encode(str(cmd))
+            data = {}
+            data["active"] = "create"
+            if jdata["type"] == "pub":
+                data["cmd"] = "./publisher -DCPSConfigFile "+jdata["rtps"]
+            elif jdata["type"] == "sub":
+                data["cmd"] = "./subscriber -DCPSConfigFile "+jdata["rtps"]
+
+            data["topic"]=jdata["topic"]
+            cmd = json.dumps(data)
+            b = str.encode(cmd)
             sendSocket.send(b)
             r = sendSocket.recv(1024)
             print(r)
@@ -52,6 +52,6 @@ def readConfig(port=0,fileName=""):
         return -1
 if __name__ =="__main__":
     print("test")
-    r = readConfig(port=0,fileName="pub.json")
+    r = readConfig(port=9808,fileName="pub.json")
     print (r)
 

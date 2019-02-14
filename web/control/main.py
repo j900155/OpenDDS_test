@@ -30,6 +30,7 @@ subStatus=0
 pub = ""
 sub = ""
 subSocketIOStatus=0
+path="/home/pi/OpenDDS_test/web/control/"
 def heart_beat():
     pass
 def publish_dds(pub_connect):
@@ -58,13 +59,14 @@ def publish_socket(pub_connect, first_data):
     data = ""
     jdata = ""
     pub_connect.settimeout(3)
+    data = first_data
     while(1):
         try:
-            if first_data == "":
-                data = pub_connect.recv(4096)
-            else:
-                data = first_data
-                first_data = ""
+            #if first_data == "":
+            #    data = pub_connect.recv(4096)
+            #else:
+            #    data = first_data
+            #    first_data = ""
             print ("pub recv data {}".format(data))
             print (type(pub_dds))
             if len(data) < 1:
@@ -87,15 +89,11 @@ def publish_socket(pub_connect, first_data):
                 print (jdata["active"])
                 if jdata["active"] =="create":
                     print (jdata["cmd"])
+                    jdata["cmd"] = jdata["cmd"].replace("./publisher",path+"/publisher")
                     print (jdata["topic"])
-                    if type(pub_dds) == type("str"):
-                        print ("pub dds type str")
-                        pubStatus = 0
-                    else:
-                        if pub_dds.poll() ==None:
-                            pubstatus = 1
-                        else:
-                            print ("poll not None")
+                    
+                    if pubStatus == 1:
+                        if pub_dds.poll() !=None:
                             pubStatus = 0
 
                     if pubStatus == 0:
@@ -127,6 +125,10 @@ def publish_socket(pub_connect, first_data):
                     if pubStatus ==1:
                         #pub_dds.send("exit")
                         pub_dds_connect.send(b'exit')
+                        try:
+                            pub_dds.wait(2)
+                        except subprocess.TimeoutExpired:
+                            pub_dds.kill()
                         pub_connect.send(b'exit')
                         pub_dds =""
                         pubStatus = 0
@@ -151,6 +153,7 @@ def publish_socket(pub_connect, first_data):
                 else:
                     pub_connect.send(b"not create")
 
+            data = pub_connect.recv(4096)
         except socket.timeout:
             print ("timeout")
                 #time.sleep(5)
@@ -225,6 +228,7 @@ def subscriber_socket(sub_connect, first_data):
                     #s = "{'send':'"+jdata["topic"] + "'}"
                     tempSocket.send(b"create")
                     time.sleep(1)
+                    jdata["cmd"] = jdata["cmd"].replace("./subscriber",path+"/subscriber")
                     tempSocket.send(str.encode(jdata["cmd"]))
                     time.sleep(1)
                     print(str(sub_dds_connect) + "224")
