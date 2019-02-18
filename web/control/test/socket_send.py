@@ -21,7 +21,7 @@ def main(send_port):
             send_socket.close()
             break
         else:
-            send_socket.send(d)
+            send_socket.send(d, socket.MSG_DONTWAIT)
 
 if __name__ =="__main__":
     send_port = int(raw_input("port "))

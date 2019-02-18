@@ -43,6 +43,7 @@ def main(port=9808):
         clientsocket.send("test")
         r = clientsocket.recv(2048)
         print(r)
+        clientsocket.send('{"send":"test data"}')
 
 if __name__ =="__main__":
     port = 9808

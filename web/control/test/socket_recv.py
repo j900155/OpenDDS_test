@@ -10,8 +10,8 @@
 
 """
 import socket
-send_port = 9808
-bind_ip = "0.0.0.0"
+send_port = 9807
+bind_ip = ""
 def main():
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

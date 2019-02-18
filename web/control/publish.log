@@ -1,305 +1,102 @@
 socket start
 topic name A
+fileName pub2018-10-22.txt./logpub2018-10-22.txt
 while 0
 while 180 0
-get data 9  data your data
+get data 12  data your data222
+while 1
+socket start
+topic name A
+fileName ./log/pub2018-10-22.txt
+while 0
+while 180 0
+get data 12  data your data222
+while 1
+socket start
+topic name A
+fileName ./log/pub2018-10-22.txt
+while 0
+while 180 0
+get data 12  data your data222
 while 1
 while 180 1
-get data 9  data your data
+get data 12  data your data222
 while 2
 while 180 2
-get data 9  data your data
+get data 12  data your data222
 while 3
 while 180 3
-get data 9  data your data
+get data 12  data your data222
 while 4
 while 180 4
-get data 9  data your data
-while 5
-socket start
-topic name A
-while 0
-while 180 0
-get data 26  data {"from":"A","message":"A"}
-while 1
-socket start
-topic name A
-while 0
-while 180 0
-get data 29  data {"from":"A","message":"AAAA"}
-while 1
-socket start
-topic name A
-while 0
-while 180 0
-get data 29  data {"from":"A","message":"AAAA"}
-while 1
-socket start
-topic name A
-while 0
-while 180 0
-get data 29  data {"from":"A","message":"AAAA"}
-while 1
-while 180 1
-get data 28  data {"from":"A","message":"AAA"}
-while 2
-while 180 2
-get data 29  data {"from":"A","message":"AAAA"}
-while 3
-while 180 3
-get data 29  data {"from":"A","message":"AAAA"}
-while 4
-while 180 4
-get data 28  data {"from":"A","message":"AAA"}
+get data 12  data your data222
 while 5
 while 180 5
-get data 29  data {"from":"A","message":"AAAA"}
-while 6
-while 180 6
-get data 26  data {"from":"A","message":"A"}
-while 7
-while 180 7
-get data 29  data {"from":"A","message":"AAAA"}
-while 8
-while 180 8
-get data 25  data {"from":"A","message":""}
-while 9
-while 180 9
-get data 31  data {"from":"A","message":"AAAAAA"}
-while 10
-while 180 10
-get data 31  data {"from":"A","message":"AAAAAA"}
-while 11
-while 180 11
-get data 30  data {"from":"A","message":"AAAAA"}
-while 12
-while 180 12
-get data 29  data {"from":"A","message":"AAAA"}
-while 13
-while 180 13
-get data 29  data {"from":"A","message":"aaaa"}
-while 14
-while 180 14
-get data 28  data {"from":"A","message":"aaa"}
-while 15
-while 180 15
-get data 28  data {"from":"A","message":"aaa"}
-while 16
-while 180 16
-get data 28  data {"from":"A","message":"AAA"}
-while 17
-while 180 17
-get data 28  data {"from":"A","message":"AAA"}
-while 18
-while 180 18
-get data 26  data {"from":"A","message":"a"}
-while 19
-while 180 19
-get data 29  data {"from":"A","message":"aaaa"}
-while 20
-while 180 20
-get data 29  data {"from":"A","message":"aaaa"}
-while 21
-while 180 21
-get data 29  data {"from":"A","message":"aaaa"}
-while 22
-while 180 22
-get data 26  data {"from":"A","message":"A"}
-while 23
-while 180 23
-get data 26  data {"from":"A","message":"A"}
-while 24
-while 180 24
-get data 29  data {"from":"A","message":"AAAA"}
-while 25
-while 180 25
-get data 29  data {"from":"A","message":"AAAA"}
-while 26
-while 180 26
-get data 26  data {"from":"A","message":"A"}
-while 27
-while 180 27
-get data 26  data {"from":"A","message":"A"}
-while 28
-while 180 28
-get data 26  data {"from":"A","message":"A"}
-while 29
-socket start
-topic name A
-while 0
-while 180 0
-get data 26  data {"from":"A","message":"A"}
-while 1
-while 180 1
-get data 29  data {"from":"A","message":"AAAA"}
-while 2
-while 180 2
-get data 28  data {"from":"A","message":"ASD"}
-while 3
-socket start
-topic name A
-while 0
-while 180 0
-get data 29  data {"from":"A","message":"AAAA"}
-while 1
-socket start
-topic name A
-while 0
-while 180 0
-get data 25  data {"from":"","message":"A"}
-while 1
-while 180 1
-get data 40  data {"from":"359513394663526","message":"A"}
-while 2
-while 180 2
-get data 43  data {"from":"7478030329853056","message":"AAA"}
-while 3
-while 180 3
-get data 41  data {"from":"4225225870753082","message":"A"}
-while 4
-while 180 4
-get data 43  data {"from":"758761306537958","message":"AAAA"}
-while 5
-while 180 5
-get data 45  data {"from":"4393362791006914","message":"AAAAA"}
-while 6
-while 180 6
-get data 46  data {"from":"6607792245032735","message":"AAAAAA"}
-while 7
-while 180 7
-get data 44  data {"from":"9735552742348846","message":"AAAA"}
-while 8
-while 180 8
-get data 43  data {"from":"5071103405840054","message":"AAA"}
-while 9
-while 180 9
-get data 43  data {"from":"585388304144483","message":"AAAA"}
-while 10
-while 180 10
-get data 43  data {"from":"9325712491506652","message":"AAA"}
-while 11
-while 180 11
-get data 44  data {"from":"2074377285550575","message":"AAAA"}
-while 12
-while 180 12
-get data 42  data {"from":"9588853670191948","message":"AA"}
-while 13
-while 180 13
-get data 44  data {"from":"1100622214255946","message":"AAAA"}
-while 14
-while 180 14
-get data 42  data {"from":"4645069689508556","message":"AA"}
-while 15
-while 180 15
-get data 41  data {"from":"341253059325008","message":"AA"}
-while 16
-while 180 16
-get data 41  data {"from":"7323252734749379","message":"A"}
-while 17
-while 180 17
-get data 41  data {"from":"1430663062330930","message":"A"}
-while 18
-while 180 18
-get data 41  data {"from":"6085565534987250","message":"a"}
-while 19
-while 180 19
-get data 44  data {"from":"5784561228734206","message":"AAAA"}
-while 20
-while 180 20
-get data 43  data {"from":"448829374381449","message":"AAAA"}
-while 21
-while 180 21
-get data 45  data {"from":"4465902886027595","message":"aaaaa"}
-while 22
-while 180 22
-get data 41  data {"from":"4057278143116867","message":"a"}
-while 23
-while 180 23
-get data 41  data {"from":"8114301808947819","message":"a"}
-while 24
-while 180 24
-get data 40  data {"from":"6427744336708638","message":""}
-while 25
-while 180 25
-get data 44  data {"from":"9394019142902526","message":"AAAA"}
-while 26
-while 180 26
-get data 45  data {"from":"253873905813390","message":"aaaaaa"}
-while 27
-while 180 27
-get data 46  data {"from":"9306253475158976","message":"aaaaaa"}
-while 28
-while 180 28
-get data 4  data exit
-end
-socket start
-topic name a
-while 0
-while 180 0
-get data 45  data {"from":"3006112244812402","message":"aaaaa"}
-while 1
-socket start
-topic name A
-while 0
-while 180 0
-get data 31  data {"from":"","message":"fdsfdsf"}
-while 1
-while 180 1
-get data 54  data {"from":"5148036040062871","message":"dddddddddddddd"}
-while 2
-while 180 2
-get data 58  data {"from":"8769237180238987","message":"zzzzzzzzzzzzzzzzzz"}
-while 3
-while 180 3
-get data 57  data {"from":"9834338336751858","message":"xxxxxxxxxxxxxxxxx"}
-while 4
-while 180 4
-get data 60  data {"from":"7925978806505217","message":"cccccccccccccccccccc"}
-while 5
-while 180 5
-get data 59  data {"from":"7324000908557786","message":"xxxxxxxxxxxxxxxxxxx"}
+get data 12  data your data222
 while 6
 while 180 6
 get data 4  data exit
 end
 socket start
 topic name A
+fileName ./log/pub2018-10-22.txt
 while 0
 while 180 0
-get data 54  data {"from":"9663788874293080","message":"dddddddddddddd"}
+get data 12  data your data222
 while 1
 while 180 1
-get data 43  data {"from":"1292745022471896","message":"ccc"}
+get data 12  data your data222
 while 2
 socket start
+socket start
 topic name A
+fileName ./log/pub2018-10-26.txt
 while 0
 while 180 0
-get data 29  data {"from":"","message":"11111"}
+get data 9  data your data
+while 1
+socket start
+topic name A
+fileName ./log/pub2019-2-15.txt
+while 0
+while 180 0
+get data 9  data your data
 while 1
 while 180 1
-get data 45  data {"from":"2097138010804691","message":"22222"}
+get data 9  data your data
 while 2
 while 180 2
-get data 45  data {"from":"9792677116489992","message":"33333"}
+get data 9  data your data
 while 3
-while 180 3
+socket start
+topic name A
+fileName ./log/pub2019-2-15.txt
+while 0
+socket start
+topic name A
+fileName ./log/pub2019-2-15.txt
+while 0
+socket start
+topic name A
+fileName ./log/pub2019-2-15.txt
+while 0
+socket start
+topic name A
+fileName ./log/pub2019-2-15.txt
+while 0
+socket start
+topic name A
+fileName ./log/pub2019-2-15.txt
+while 0
+while 180 0
+get data 9  data your data
+while 1
+while 180 1
 get data 4  data exit
 end
 socket start
 topic name A
-while 0
-while 180 0
-get data 44  data {"from":"8580572123317912","message":"ffff"}
-while 1
-while 180 1
-get data 47  data {"from":"1750450655532904","message":"fffffff"}
-while 2
-socket start
-topic name A
-while 0
-socket start
-topic name A
+fileName ./log/pub2019-2-15.txt
 while 0
 while 180 0
 get data 9  data your data

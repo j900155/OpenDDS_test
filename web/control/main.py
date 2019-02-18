@@ -56,7 +56,10 @@ def publish_socket(pub_connect, first_data):
         kill dds publish {"active":"kill"}
         dds publish send data {"send":"your data"}
         ToDo
-        create mqtt publish {"active":"create","broker":"127.0.0.1","topic":"A","qos":0}
+        create mqtt publish {"active":"create","broker":"127.0.0.1","topic":"A","qos":0, "type": "mqtt"}
+        get mqtt publish status {"active":"status","type":"mqtt"}
+        kill mqtt publish {"active":"kill","type":"mqtt"}
+        mqtt publish send data {"send":"your data","type":"mqtt"}
     """ 
 
     global pub_dds_connect
@@ -86,8 +89,14 @@ def publish_socket(pub_connect, first_data):
                 print ("not dict")
                 pub_connect.send(b'json paser error')
                 jdata = ""
+            if not("type" in jdata):
+                jdata["type"]="dda"
             if "active" in jdata:
-                r = pubDdsAction(jdata)
+                if jdata["type"] == "dds":
+                    r = pubDdsAction(jdata)
+                elif jdata["type"] == "mqtt":
+                    r = pubMqttAction(jdata)
+
                 pub_connect.send(str.encode(r))
             if "send" in jdata:
                 print ("pub send data")
@@ -153,7 +162,8 @@ def pubDdsAction(jdata):
         else:
             return "not create"
     return "null"
-def mqtt_action(jdata):
+
+def pubMqttAction(jdata):
     global pubMqttStatus
 
     if "create" == jdata["active"]:
@@ -162,11 +172,14 @@ def mqtt_action(jdata):
             pass
         else:
             return "exist"
-    if "status" == jdata["active"]:
+    elif "status" == jdata["active"]:
         if pubMqttStatus == 1:
             return "exist"
         else:
             return "not create"
+    elif "kill" == jdata["active"]:
+
+    
 
 
 
@@ -227,55 +240,8 @@ def subscriber_socket(sub_connect, first_data):
         if "active" in jdata:
             r = subDdsAction(jdata)
             sub_connect.send(str.encode(r))
-        """
-        if "active" in jdata:
-            print (jdata["active"])
-            if jdata["active"] =="create":
-                print (jdata["cmd"])
-                print (jdata["topic"])
-                
-                if subDdsStatus ==0:
-                    print ("sub dds start")
-                    tempSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    tempSocket.connect((HOST,sub_PORT))
-                    #s = "{'send':'"+jdata["topic"] + "'}"
-                    tempSocket.send(b"create")
-                    time.sleep(1)
-                    jdata["cmd"] = jdata["cmd"].replace("./subscriber",path+"/subscriber")
-                    sub_dds = Popen(jdata["cmd"].split(" "))
-                    time.sleep(1)
-                    print (jdata["topic"])
-                    sub_dds_connect.send(str.encode(jdata["topic"]))
-                    time.sleep(1)
-                    sub_dds_connect.send(str.encode(str(datetime.now().date())))
-                    print (type(sub_dds))
-                    sub_connect.send(b'create')
-                    subDdsStatus = 1
-                else:
-                    print("exist")
-                    sub_connect.send(b"exist")
-                    
-            elif jdata["active"] =="status":
-                if subDdsStatus==0:
-                    sub_connect.send(b"not create")
-                else:
-                    sub_connect.send(b"exist")
-            elif jdata["active"] == "kill":
-                if subDdsStatus==1:
-                    sub_dds_connect.send(b"exit")
-                    sub_dds_connect = ""
-                    for sub_client in sub_client_connect:
-                        sub_client.close()
-                    sub_dds.kill()
-                    subSocketIOStatus=0
-                    subDdsStatus = 0
-                    sub_connect.send(b'kill')
-                    #break
-                else:
-                    sub_connect.send(b"not create")
-    """
-
         data = sub_connect.recv(4096)
+
 def subDdsAction(jdata):
     global sub_dds_connect
     global subDdsStatus
