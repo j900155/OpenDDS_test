@@ -1,0 +1,3 @@
+[submodule "web/control/mqttModule"]
+	path = web/control/mqttModule
+	url = https://github.com/j13tw/OpenDDS_Transport_MQTT.git

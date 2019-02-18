@@ -30,6 +30,20 @@ def main(port=9808):
     (clientsocket, address) = send_socket.accept()
     r = clientsocket.recv(64)
     print(r)
+    data = {}
+    data["broker"]=brokerIp
+    data["topic"]=topic
+    data["qos"]=MqttQos
+    s = json.dumps(data)
+    print(s)
+    clientsocket.send(json.dumps(data).encode("utf-8"))
+    r = clientsocket.recv(64)
+    print(r)
+    if r.decode("utf-8")=='{"status":"create"}':
+        clientsocket.send("test")
+        r = clientsocket.recv(2048)
+        print(r)
+        clientsocket.send('{"send":"test data"}')
 
 if __name__ =="__main__":
     port = 9808

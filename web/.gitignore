@@ -3,3 +3,5 @@ Messenger*.cpp
 GNUmakefile*
 Messenger*.ini
 .depend.*
+*.swap
+*.pyc

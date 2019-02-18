@@ -10,20 +10,16 @@
 
 """
 import socket
-bind_ip = "0.0.0.0"
-def main(send_port):
+send_port = 9807
+bind_ip = ""
+def main():
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     send_socket.connect((bind_ip,send_port))
+    send_socket.send("recv")
     while(1):
-        d = raw_input("input")
-        if d=="-1":
-            send_socket.close()
-            break
-        else:
-            send_socket.send(d, socket.MSG_DONTWAIT)
+        print send_socket.recv(4096)
 
 if __name__ =="__main__":
-    send_port = int(raw_input("port "))
-    main(send_port)
+    main()
 

@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
 		{
 			break;
 		}
+		sleep(10);
 	}
 	close(client_sockfd);
 	close(server_sockfd);

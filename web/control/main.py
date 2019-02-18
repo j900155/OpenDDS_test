@@ -6,6 +6,7 @@
 
 """
 from subprocess import Popen, PIPE, STDOUT
+import os
 import socket,sys
 import run_dds
 import threading
@@ -22,14 +23,17 @@ sub_PORT = 9807
 pub_dds_connect = ""
 sub_dds_connect = ""
 
+pub_mqtt_connect = ""
+
 sub_client_connect = []
 pub_dds = ""
-pubStatus=0
+pubDdsStatus=0
 sub_dds = ""
-subStatus=0
+subDdsStatus=0
 pub = ""
 sub = ""
 subSocketIOStatus=0
+path=os.getcwd()
 def heart_beat():
     pass
 def publish_dds(pub_connect):
@@ -51,20 +55,22 @@ def publish_socket(pub_connect, first_data):
         exit dds publish {"active":"exit"}
         kill dds publish {"active":"kill"}
         dds publish send data {"send":"your data"}
+        ToDo
+        create mqtt publish {"active":"create","broker":"127.0.0.1","topic":"A","qos":0, "type": "mqtt"}
+        get mqtt publish status {"active":"status","type":"mqtt"}
+        kill mqtt publish {"active":"kill","type":"mqtt"}
+        mqtt publish send data {"send":"your data","type":"mqtt"}
     """ 
+
     global pub_dds_connect
     global pub_dds
-    global pubStatus
+    global pubDdsStatus
     data = ""
     jdata = ""
-    pub_connect.settimeout(3)
+    #pub_connect.settimeout(3)
+    data = first_data
     while(1):
         try:
-            if first_data == "":
-                data = pub_connect.recv(4096)
-            else:
-                data = first_data
-                first_data = ""
             print ("pub recv data {}".format(data))
             print (type(pub_dds))
             if len(data) < 1:
@@ -83,80 +89,99 @@ def publish_socket(pub_connect, first_data):
                 print ("not dict")
                 pub_connect.send(b'json paser error')
                 jdata = ""
+            if not("type" in jdata):
+                jdata["type"]="dda"
             if "active" in jdata:
-                print (jdata["active"])
-                if jdata["active"] =="create":
-                    print (jdata["cmd"])
-                    print (jdata["topic"])
-                    if type(pub_dds) == type("str"):
-                        print ("pub dds type str")
-                        pubStatus = 0
-                    else:
-                        if pub_dds.poll() ==None:
-                            pubstatus = 1
-                        else:
-                            print ("poll not None")
-                            pubStatus = 0
+                if jdata["type"] == "dds":
+                    r = pubDdsAction(jdata)
+                elif jdata["type"] == "mqtt":
+                    r = pubMqttAction(jdata)
 
-                    if pubStatus == 0:
-                        print ("pub dds start")
-                        tempSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                        tempSocket.connect((HOST,pub_PORT))
-                        #s = "{'send':'"+jdata["topic"] + "'}"
-                        tempSocket.send(b"create")
-                        time.sleep(1)
-                        tempSocket.send(str.encode(jdata["cmd"]))
-                        time.sleep(1)
-                        pub_dds_connect.send(str.encode(jdata["topic"]))
-                        tempSocket.close()
-                        print (type(pub_dds))
-                        pub_connect.send(b'create')
-                        pubStatus = 1
-                    else:
-                        print("exist")
-                        pub_connect.send(b'exist')
-
-                elif jdata["active"] =="status":
-                    if pubStatus ==1:
-                        #alive
-                        pub_connect.send(b"exist")
-                    else:
-                        pub_connect.send(b"not create")
-
-                elif jdata["active"] == "exit":
-                    if pubStatus ==1:
-                        #pub_dds.send("exit")
-                        pub_dds_connect.send(b'exit')
-                        pub_connect.send(b'exit')
-                        pub_dds =""
-                        pubStatus = 0
-                        #break
-                    else:
-                        pub_connect.send(b"not create")
-                elif jdata["active"] == "kill":
-                    if pubStatus==1:
-                        pub_dds.kill()
-                        pub_dds =""
-                        pubStatus = 0
-                        pub_connect.send(b'kill')
-                        break
-                    else:
-                        pub_connect.send(b"not create")
+                pub_connect.send(str.encode(r))
             if "send" in jdata:
                 print ("pub send data")
                 print ("pub_dds_connect type {}".format(type(pub_dds_connect)))
-                if pubStatus ==1:
+                if pubDdsStatus ==1:
                     pub_dds_connect.send(str.encode(jdata["send"]))
                     pub_connect.send(str.encode(jdata["send"]))
                 else:
                     pub_connect.send(b"not create")
 
+            data = pub_connect.recv(4096)
         except socket.timeout:
             print ("timeout")
                 #time.sleep(5)
 
     pub_connect.close()
     print ("publish_socket end")
+
+def pubDdsAction(jdata):
+    global pub_dds_connect
+    global pubDdsStatus
+    global pub_dds
+    if pubDdsStatus == 1:
+        if pub_dds.poll() !=None:
+          pubDdsStatus = 0
+
+    if "status" == jdata["active"]:
+        if pubDdsStatus == 0 :
+            return "not create"
+        else:
+            return "create"
+
+    elif"create" ==  jdata["active"]:
+        if pubDdsStatus == 0:
+            print ("pub dds start")
+            jdata["cmd"] = jdata["cmd"].replace("./publisher",path+"/publisher")
+            pub_dds = Popen(jdata["cmd"].split(" "))
+            time.sleep(1)
+            pub_dds_connect.send(str.encode(jdata["topic"]))
+            print (type(pub_dds))
+            pubDdsStatus = 1
+            return "create"
+        else:
+            return "exist"
+
+    elif "exit" ==  jdata["active"]:
+        if pubDdsStatus ==1:
+            pub_dds_connect.send(b'exit')
+            try:
+                pub_dds.wait(2)
+            except subprocess.TimeoutExpired:
+                pub_dds.kill()
+            pub_dds =""
+            pubDdsStatus = 0
+            return "exit"
+        else:
+            return "not create"
+    elif "kill" == jdata["active"]:
+        if pubDdsStatus ==1:
+            pub_dds.kill()
+            pubDdsStatus = 0
+            return "kill"
+        else:
+            return "not create"
+    return "null"
+
+def pubMqttAction(jdata):
+    global pubMqttStatus
+
+    if "create" == jdata["active"]:
+        if pubMqttStatus == 0:
+            #create publisher mqtt
+            pass
+        else:
+            return "exist"
+    elif "status" == jdata["active"]:
+        if pubMqttStatus == 1:
+            return "exist"
+        else:
+            return "not create"
+    elif "kill" == jdata["active"]:
+
+    
+
+
 
 def subscriber_dds(sub_connect):
     global sub_client_connect
@@ -189,7 +214,7 @@ def subscriber_socket(sub_connect, first_data):
         kill dds subscriber {"active":"exit"}
     """
     global sub_dds
-    global subStatus
+    global subDdsStatus
     global sub_dds_connect
     global subSocketIOStatus
     #global sub_client_connect
@@ -213,60 +238,62 @@ def subscriber_socket(sub_connect, first_data):
             jdata = ""
         print (type(jdata))
         if "active" in jdata:
-            print (jdata["active"])
-            if jdata["active"] =="create":
-                print (jdata["cmd"])
-                print (jdata["topic"])
-                
-                if subStatus ==0:
-                    print ("sub dds start")
-                    tempSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    tempSocket.connect((HOST,sub_PORT))
-                    #s = "{'send':'"+jdata["topic"] + "'}"
-                    tempSocket.send(b"create")
-                    time.sleep(1)
-                    tempSocket.send(str.encode(jdata["cmd"]))
-                    time.sleep(1)
-                    print(str(sub_dds_connect) + "224")
-                    print (jdata["topic"])
-                    sub_dds_connect.send(str.encode(jdata["topic"]))
-                    time.sleep(1)
-                    sub_dds_connect.send(str.encode(str(datetime.now().date())))
-                    tempSocket.close()
-                    print (type(sub_dds))
-                    sub_connect.send(b'create')
-                    subStatus = 1
-                else:
-                    print("exist")
-                    sub_connect.send(b"exist")
-                    
-            elif jdata["active"] =="status":
-                if subStatus==0:
-                    sub_connect.send(b"not create")
-                else:
-                    sub_connect.send(b"exist")
-            elif jdata["active"] == "kill":
-                if subStatus==1:
-                    sub_dds_connect.send(b"exit")
-                    sub_dds_connect = ""
-                    for sub_client in sub_client_connect:
-                        sub_client.close()
-                    sub_dds.kill()
-                    subSocketIOStatus=0
-                    subStatus = 0
-                    sub_connect.send(b'kill')
-                    break
-                else:
-                    sub_connect.send(b"not create")
-
+            r = subDdsAction(jdata)
+            sub_connect.send(str.encode(r))
         data = sub_connect.recv(4096)
- 
+
+def subDdsAction(jdata):
+    global sub_dds_connect
+    global subDdsStatus
+    global sub_dds
+    if subDdsStatus == 1:
+        if sub_dds.poll() !=None:
+          subDdsStatus = 0
+
+    if "status" == jdata["active"]:
+        if subDdsStatus == 0 :
+            return "not create"
+        else:
+            return "create"
+
+    elif"create" ==  jdata["active"]:
+        if subDdsStatus == 0:
+            print ("pub dds start")
+            sub_dds = Popen(jdata["cmd"].split(" "))
+            time.sleep(1)
+            sub_dds_connect.send(str.encode(jdata["topic"]))
+            print (type(pub_dds))
+            subDdsStatus = 1
+            return "create"
+        else:
+            return "exist"
+
+    elif "exit" ==  jdata["active"]:
+        if subDdsStatus ==1:
+            sub_dds_connect.send(b'exit')
+            try:
+                sub_dds.wait(2)
+            except subprocess.TimeoutExpired:
+                sub_dds.kill()
+            sub_dds =""
+            subDdsStatus = 0
+            return "exit"
+        else:
+            return "not create"
+    elif "kill" == jdata["active"]:
+        if subDdsStatus ==1:
+            sub_dds.kill()
+            subDdsStatus = 0
+            return "kill"
+        else:
+            return "not create"
+    return "null"
+
 def creat_subscriber_server():
     global sub_client_connect
     global sub_dds
     global subSocketIOStatus
     try:
-        #server = socket.MSG_DONTROUTEcket(socket.AF_INET, socket.SOCK_STREAM)
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     except socket.err:
@@ -293,11 +320,6 @@ def creat_subscriber_server():
             print ("recv" + s)
             conn.settimeout(0.1)
             sub_client_connect.append(conn)
-        elif s =="create":
-            print("sub popen")
-            data = conn.recv(128)
-            s = str(data, encoding="utf8")
-            sub_dds = Popen(s.split(" "))
         elif s=="socketio":
             subSocketIOStatus=1
         else:
@@ -330,12 +352,11 @@ def create_publish_server():
             print(type(pub_dds_connect))
             pub_server = threading.Thread(target=publish_dds,args=[conn])
             pub_server.start()
-        elif s=="create":
-            print ("271")
-            data = conn.recv(4096)
-            s = str(data, encoding="utf8")
-            print ("273" + s)
-            pub_dds = Popen(s.split(" "))
+        elif s== "mqtt":
+            print("mqtt")
+            global pub_mqtt_connect
+            pub_mqtt_connect = conn
+            #TODO start pub mqtt
         else:
             pub_client = threading.Thread(target=publish_socket,args=[conn, data])
             pub_client.start()

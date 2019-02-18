@@ -130,12 +130,14 @@ int ACE_TMAIN(int argc, char *argv[])
 	struct timeval tv;
 	int get_count = 0;
 	int delay_us = 1000;
-	std::string fileName;
-	len = recv(sockfd,buf,BUFFSIZE,0);
-	buf[len]='\0';
+	time_t t=time(NULL);
+	tm* timePtr = localtime(&t);
+	std::string fileName = "";
+	int year = timePtr->tm_year+1900;
+	int month = timePtr->tm_mon+1;
+	int day = timePtr->tm_mday;
+	len = sprintf(buf,"sub%d-%d-%d.txt",year,month,day);
 	fileName = buf;
-	fileName = "sub"+fileName;
-	fileName +=".txt";
 	fileName = "./log/" + fileName;
 	fp.open(fileName, std::fstream::out | std::fstream::app);
 	//socket create
