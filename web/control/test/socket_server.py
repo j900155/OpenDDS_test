@@ -10,19 +10,28 @@
 
 """
 import socket
+import json
+
 send_port = 9808
 recv_port = 9807
 bind_ip = "0.0.0.0"
-def main():
+
+brokerIp = "127.0.0.1"
+topic = "test"
+MqttQos=0
+
+def main(port=9808):
+    print "ip {}  port {}".format(bind_ip, port)
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #send_socket.bind((bind_ip,send_port))
-    send_socket.bind((bind_ip,recv_port))
-    send_port.listen(2)
+    send_socket.bind((bind_ip,port))
+    send_socket.listen(2)
     
-    (clientsocket, address) = send_port.accept()
-
+    (clientsocket, address) = send_socket.accept()
+    r = clientsocket.recv(64)
+    print(r)
 
 if __name__ =="__main__":
-    print "ip {}  port {}".format(bind_ip, send_port)
-
+    port = 9808
+    main(9808)
 
