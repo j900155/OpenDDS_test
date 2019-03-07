@@ -21,7 +21,7 @@ topic = "test"
 MqttQos=0
 
 def main(port=9808):
-    print "ip {}  port {}".format(bind_ip, port)
+    print ("ip {}  port {}".format(bind_ip, port))
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #send_socket.bind((bind_ip,send_port))
     send_socket.bind((bind_ip,port))
@@ -40,10 +40,12 @@ def main(port=9808):
     r = clientsocket.recv(64)
     print(r)
     if r.decode("utf-8")=='{"status":"create"}':
-        clientsocket.send("test")
-        r = clientsocket.recv(2048)
-        print(r)
-        clientsocket.send('{"send":"test data"}')
+        for x in range(0, 100):
+            clientsocket.send(('{"send":"test data count ' + str(x) + '"}').encode())
+            r = clientsocket.recv(2048)
+            print('data_set_' + str(x) + ' --> return', r.decode('utf-8'))
+    while(1):
+        count = 0
 
 if __name__ =="__main__":
     port = 9808
