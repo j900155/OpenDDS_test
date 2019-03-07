@@ -24,14 +24,19 @@ pub_dds_connect = ""
 sub_dds_connect = ""
 
 pub_mqtt_connect = ""
+sub_mqtt_connect = ""
 
 sub_client_connect = []
 pub_dds = ""
 pubDdsStatus=0
 sub_dds = ""
 subDdsStatus=0
+
 pub = ""
 sub = ""
+
+pubMqttStatus=0
+subMqttStatus=0
 subSocketIOStatus=0
 path=os.getcwd()
 def heart_beat():
@@ -65,6 +70,7 @@ def publish_socket(pub_connect, first_data):
     global pub_dds_connect
     global pub_dds
     global pubDdsStatus
+    global pubMqttStatus
     data = ""
     jdata = ""
     #pub_connect.settimeout(3)
@@ -90,23 +96,36 @@ def publish_socket(pub_connect, first_data):
                 pub_connect.send(b'json paser error')
                 jdata = ""
             if not("type" in jdata):
-                jdata["type"]="dda"
+                jdata["type"]="dds"
             if "active" in jdata:
                 if jdata["type"] == "dds":
                     r = pubDdsAction(jdata)
                 elif jdata["type"] == "mqtt":
                     r = pubMqttAction(jdata)
-
+                else:
+                    r = pubDdsAction(jdata)
                 pub_connect.send(str.encode(r))
             if "send" in jdata:
                 print ("pub send data")
                 print ("pub_dds_connect type {}".format(type(pub_dds_connect)))
                 if pubDdsStatus ==1:
+                    print ("dds send")
                     pub_dds_connect.send(str.encode(jdata["send"]))
                     pub_connect.send(str.encode(jdata["send"]))
                 else:
-                    pub_connect.send(b"not create")
+                    if jdata["type"] != "mqtt":
+                        pub_connect.send(str.encode("116 not create"))
 
+                if pubMqttStatus ==1:
+                    print ("mqtt sned")
+                    pub_mqtt_connect.send(data)
+                    r = pub_mqtt_connect.recv(1024)
+                    pub_connect.send(r)
+                else:
+                    pub_connect.send(str.encode("122 not create"))
+
+            jdata = ""
+            r = ""
             data = pub_connect.recv(4096)
         except socket.timeout:
             print ("timeout")
@@ -119,6 +138,7 @@ def pubDdsAction(jdata):
     global pub_dds_connect
     global pubDdsStatus
     global pub_dds
+    print ("pubDdsAction")
     if pubDdsStatus == 1:
         if pub_dds.poll() !=None:
           pubDdsStatus = 0
@@ -165,11 +185,29 @@ def pubDdsAction(jdata):
 
 def pubMqttAction(jdata):
     global pubMqttStatus
-
+    global pub_mqtt_connect
+    global pub_mqtt
+    print("pubMqttAction")
     if "create" == jdata["active"]:
         if pubMqttStatus == 0:
             #create publisher mqtt
-            pass
+            pub_mqtt = Popen("python3 mqttModule/socket_2_publish.py".split(" "))
+            tryCount = 0
+            while 1:
+                if type(pub_mqtt_connect) != type("str"):
+                    if tryCount <3:
+                        time.sleep(1)
+                    else:
+                        return "create error"
+                else:
+                    break
+            time.sleep(1)
+            s = json.dumps(jdata)
+            pub_mqtt_connect.send(str.encode(s))
+            r = pub_mqtt_connect.recv(2048)
+            print("206 "+r.decode("utf-8"))
+            pubMqttStatus=1
+            return "create mqtt"
         else:
             return "exist"
     elif "status" == jdata["active"]:
@@ -178,11 +216,14 @@ def pubMqttAction(jdata):
         else:
             return "not create"
     elif "kill" == jdata["active"]:
+        pub_mqtt.kill()
+        pub_mqtt = ""
+        pubMqttStatus=0
+        return "kill"
+    return "mqtt else"
+        
 
-    
-
-
-
+      
 def subscriber_dds(sub_connect):
     global sub_client_connect
     global subSocketIOStatus
@@ -204,12 +245,28 @@ def subscriber_dds(sub_connect):
             except socket.timeout:
                     print("timeout sub_client")
 
+def subscriber_mqtt(sub_connect):
+    global sub_client_connect
+    while(1):
+        data = sub_connect.recv(4096)
+        print ("subscriber mqtt {}".format(data))
+        if len(data)<1:
+            break
+        for sub_client in sub_client_connect:
+            print (sub_client)
+            try:
+                sub_client.send(data)
+            except socket.timeout:
+                print("timeout sub_client")
+
+
 def subscriber_socket(sub_connect, first_data):
     """
     subscriber_socket client
     create dds subscriber thread and recriver from dds publisher
     use json to 
-        create dds subscriber {"active":"create","cmd":"./subscriber -DCPSConfigFIle rtps.ini","topic":"A"}
+        create dds subscriber {"active":"create","cmd":"./subscriber -DCPSConfigFile rtps.ini","topic":"A"}
+        create mqtt publish {"active":"create","broker":"127.0.0.1","topic":"A","qos":0, "type": "mqtt"}
         get dds subscriver thread status {"active":"status"}
         kill dds subscriber {"active":"exit"}
     """
@@ -237,9 +294,16 @@ def subscriber_socket(sub_connect, first_data):
             sub_connect.send(b'json paser error')
             jdata = ""
         print (type(jdata))
+        if not "type" in jdata:
+            jdata["type"]="dds"
         if "active" in jdata:
-            r = subDdsAction(jdata)
-            sub_connect.send(str.encode(r))
+            if jdata["type"] =="dds":
+                r = subDdsAction(jdata)
+                sub_connect.send(str.encode(r))
+            elif jdata["type"] == "mqtt":
+                r = subMqttStatus(jdata)
+                sub_connect.send(str.encode(r))
+        r = "" 
         data = sub_connect.recv(4096)
 
 def subDdsAction(jdata):
@@ -288,11 +352,50 @@ def subDdsAction(jdata):
         else:
             return "not create"
     return "null"
-
+def subMqttAction(jdata):
+    global subMqttStatus
+    global sub_mqtt_connect
+    global sub_mqtt
+    print("pubMqttAction")
+    if "create" == jdata["active"]:
+        if subMqttStatus == 0:
+            #create publisher mqtt
+            sub_mqtt = Popen("python3 mqttModule/subscribe_2_socket.py".split(" "))
+            tryCount = 0
+            while 1:
+                if type(sub_mqtt_connect) != type("str"):
+                    if tryCount <3:
+                        time.sleep(1)
+                    else:
+                        return "create error"
+                else:
+                    break
+            time.sleep(1)
+            s = json.dumps(jdata)
+            sub_mqtt_connect.send(str.encode(s))
+            r = sub_mqtt_connect.recv(2048)
+            print("206 "+r.decode("utf-8"))
+            subMqttStatus=1
+            return "create mqtt"
+        else:
+            return "exist"
+    elif "status" == jdata["active"]:
+        if subMqttStatus == 1:
+            return "exist"
+        else:
+            return "not create"
+    elif "kill" == jdata["active"]:
+        sub_mqtt.kill()
+        sub_mqtt = ""
+        subMqttStatus=0
+        return "kill"
+    return "mqtt else"
+ 
 def creat_subscriber_server():
     global sub_client_connect
     global sub_dds
     global subSocketIOStatus
+    global sub_mqtt_connect
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -316,6 +419,8 @@ def creat_subscriber_server():
             sub_dds_connect = conn
             sub_server = threading.Thread(target=subscriber_dds,args=[conn])
             sub_server.start()
+        elif s == "mqtt":
+            sub_mqtt_connect = conn
         elif s =="recv":
             print ("recv" + s)
             conn.settimeout(0.1)

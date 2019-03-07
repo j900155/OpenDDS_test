@@ -101,3 +101,33 @@ while 0
 while 180 0
 get data 9  data your data
 while 1
+socket start
+topic name 
+fileName ./log/pub2019-3-5.txt
+while 0
+while 180 0
+err-1
+end
+socket start
+topic name UPS
+fileName ./log/pub2019-3-5.txt
+while 0
+while 180 0
+get data 4  data fdsf
+while 1
+while 180 1
+get data 4  data exit
+end
+socket start
+topic name A
+fileName ./log/pub2019-3-5.txt
+while 0
+while 180 0
+get data 4  data fdsf
+while 1
+while 180 1
+get data 4  data fdsf
+while 2
+while 180 2
+get data 5  data fdsf2
+while 3
