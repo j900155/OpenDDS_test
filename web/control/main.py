@@ -246,8 +246,10 @@ def subscriber_dds(sub_connect):
                     print("timeout sub_client")
 
 def subscriber_mqtt(sub_connect):
+    print("subscriber_mqtt server")
     global sub_client_connect
     while(1):
+        print("wait sub recv")
         data = sub_connect.recv(4096)
         print ("subscriber mqtt {}".format(data))
         if len(data)<1:
@@ -266,7 +268,7 @@ def subscriber_socket(sub_connect, first_data):
     create dds subscriber thread and recriver from dds publisher
     use json to 
         create dds subscriber {"active":"create","cmd":"./subscriber -DCPSConfigFile rtps.ini","topic":"A"}
-        create mqtt publish {"active":"create","broker":"127.0.0.1","topic":"A","qos":0, "type": "mqtt"}
+        create mqtt subscriber {"active":"create","broker":"127.0.0.1","topic":"A","qos":0, "type": "mqtt"}
         get dds subscriver thread status {"active":"status"}
         kill dds subscriber {"active":"exit"}
     """
@@ -278,6 +280,7 @@ def subscriber_socket(sub_connect, first_data):
     #sub_connect.settimeout(0.0)
     #sub_client_connect.append(sub_connect)
     data = first_data
+    r = ""
     while(1):
         #data = sub_connect.recv(4096)
         print("sub recv data {}".format(data))
@@ -301,9 +304,8 @@ def subscriber_socket(sub_connect, first_data):
                 r = subDdsAction(jdata)
                 sub_connect.send(str.encode(r))
             elif jdata["type"] == "mqtt":
-                r = subMqttStatus(jdata)
+                r = subMqttAction(jdata)
                 sub_connect.send(str.encode(r))
-        r = "" 
         data = sub_connect.recv(4096)
 
 def subDdsAction(jdata):
@@ -322,7 +324,7 @@ def subDdsAction(jdata):
 
     elif"create" ==  jdata["active"]:
         if subDdsStatus == 0:
-            print ("pub dds start")
+            print ("sub dds start")
             sub_dds = Popen(jdata["cmd"].split(" "))
             time.sleep(1)
             sub_dds_connect.send(str.encode(jdata["topic"]))
@@ -420,7 +422,10 @@ def creat_subscriber_server():
             sub_server = threading.Thread(target=subscriber_dds,args=[conn])
             sub_server.start()
         elif s == "mqtt":
+            print("create mqtt sub server")
             sub_mqtt_connect = conn
+            subMqttServer = threading.Thread(target=subscriber_mqtt, args=[conn])
+            subMqttServer.start()
         elif s =="recv":
             print ("recv" + s)
             conn.settimeout(0.1)
