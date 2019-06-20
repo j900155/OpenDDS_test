@@ -12,29 +12,33 @@
 import socket
 import time
 import json
-bind_ip = "10.30.3.4"
-def main(send_port):
+bind_ip = "10.0.0.200"
+def main(size):
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    send_socket.connect((bind_ip,send_port))
+    send_socket.connect((bind_ip,9808))
     count = 0
     data = {}
     data2 = {}
     data["send"]= ""
-    data2["from"]="A"
-    while(1):
-        data2["message"] = "test"+str(time.ctime())
-        j = json.dumps(data2)
-        data["send"]=j
+    timeTmp = time.time()
+    nowTime = 0
+    d = ""
+    for i in range(0,int(size)):
+        d+="A"
+    data["send"] = d
+    while((nowTime - timeTmp)<10):
+        nowTime = time.time()
         j2 = json.dumps(data)
         print (j2)
+        print(nowTime-int(nowTime))
         send_socket.send(j2)
         r = send_socket.recv(2048)
         print (r)
         count +=1
-        time.sleep(0.01)
+        time.sleep(0.001)
 
 if __name__ =="__main__":
-    send_port = int(raw_input("port "))
-    main(send_port)
+    size = int(raw_input("size "))
+    main(size)
 
